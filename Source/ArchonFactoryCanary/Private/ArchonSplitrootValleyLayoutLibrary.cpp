@@ -72,7 +72,7 @@ namespace
 			{ FVector2D(-15000.0, 0.0), FVector2D(-4000.0, -7000.0) },
 			{ FVector2D(14500.0, 5200.0), FVector2D(7800.0, 1200.0) },
 			{ FVector2D(7800.0, 1200.0), FVector2D(2000.0, 1400.0) },
-			{ FVector2D(12000.0, -8500.0), FVector2D(2000.0, -1400.0) },
+			{ FVector2D(12000.0, -10000.0), FVector2D(2000.0, -1400.0) },
 			{ FVector2D(2000.0, 1400.0), FVector2D(0.0, -3000.0) },
 			{ FVector2D(2000.0, -1400.0), FVector2D(0.0, -3000.0) },
 			{ FVector2D(0.0, 7000.0), FVector2D(0.0, -3000.0) }
@@ -251,7 +251,7 @@ TArray<FArchonValleyPlacement> UArchonSplitrootValleyLayoutLibrary::BuildSplitro
 	// each corner reads as owned territory before real art exists.
 	const FVector VerdantBase(-15000.0, 0.0, 0.0);
 	const FVector LenswrightBase(14500.0, 5200.0, 0.0);
-	const FVector KinwildBase(12000.0, -8500.0, 0.0);
+	const FVector KinwildBase(12000.0, -10000.0, 0.0);
 
 	Layout.Add(MakeValleyPlacement(
 		TEXT("verdant_base"), EArchonValleyPiece::VerdantOutpost,

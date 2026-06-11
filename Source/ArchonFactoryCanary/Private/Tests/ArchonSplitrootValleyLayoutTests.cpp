@@ -62,7 +62,7 @@ namespace
 			{ FVector2D(-15000.0, 0.0), FVector2D(-4000.0, -7000.0) },
 			{ FVector2D(14500.0, 5200.0), FVector2D(7800.0, 1200.0) },
 			{ FVector2D(7800.0, 1200.0), FVector2D(2000.0, 1400.0) },
-			{ FVector2D(12000.0, -8500.0), FVector2D(2000.0, -1400.0) },
+			{ FVector2D(12000.0, -10000.0), FVector2D(2000.0, -1400.0) },
 			{ FVector2D(2000.0, 1400.0), FVector2D(0.0, -3000.0) },
 			{ FVector2D(2000.0, -1400.0), FVector2D(0.0, -3000.0) },
 			{ FVector2D(0.0, 7000.0), FVector2D(0.0, -3000.0) }
@@ -331,7 +331,7 @@ bool FArchonValleyPrimaryRoutesAvoidReplayHotZonesTest::RunTest(const FString& P
 		{ TEXT("west_to_south_site"), FVector2D(-15000.0, 0.0), FVector2D(-4000.0, -7000.0) },
 		{ TEXT("lens_to_lower_bend"), FVector2D(14500.0, 5200.0), FVector2D(7800.0, 1200.0) },
 		{ TEXT("lens_lower_bend_to_center"), FVector2D(7800.0, 1200.0), FVector2D(2000.0, 1400.0) },
-		{ TEXT("kinwild_to_center"), FVector2D(12000.0, -8500.0), FVector2D(2000.0, -1400.0) },
+		{ TEXT("kinwild_to_center"), FVector2D(12000.0, -10000.0), FVector2D(2000.0, -1400.0) },
 		{ TEXT("lens_mid_to_center"), FVector2D(2000.0, 1400.0), FVector2D(0.0, -3000.0) },
 		{ TEXT("kinwild_mid_to_center"), FVector2D(2000.0, -1400.0), FVector2D(0.0, -3000.0) },
 		{ TEXT("north_site_to_center"), FVector2D(0.0, 7000.0), FVector2D(0.0, -3000.0) }
