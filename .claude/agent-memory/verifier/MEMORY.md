@@ -1,0 +1,1 @@
+- [local-proof-checks trusts cached artifacts](project_local_proof_cache_model.md) — `Proof/local-proof-checks.ps1` reports ProofClaimState from cached `Saved/Proof/*.json`; it does not re-run Unreal. Freshness must be checked separately.

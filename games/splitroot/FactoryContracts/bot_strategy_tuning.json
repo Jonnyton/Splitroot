@@ -1,0 +1,53 @@
+{
+  "schema": "tinyassets.game_factory.bot_strategy_tuning.v1",
+  "authored_at_utc": "2026-06-11T18:49:00Z",
+  "author": "Vector (Codex AI strategy lane)",
+  "revision": "vector-2026-06-11-earlier-objective-lane-v7",
+  "purpose": "Match-spawn bot strategy knobs for SPLITROOT. The Unreal bot controller and brain read this contract at bot spawn so future strategy changes can be made from replay/live metadata without changing C++ constants.",
+  "hot_load_policy": "Loaded when bots are configured. A running process needs the native loader once; after that, edits here apply to newly spawned bots and next-match loops without closing Jonathan's visible game.",
+  "roles": {
+    "role_cycle": ["fighter", "fighter", "breacher"],
+    "fighter_engage_range": 1400.0,
+    "breacher_engage_range": 500.0,
+    "breacher_pursuit_memory_window_seconds": 2.5,
+    "breacher_threat_window_seconds": 3.5
+  },
+  "perception": {
+    "vision_half_angle_degrees": 70.0,
+    "hearing_radius": 800.0,
+    "eyes_on_radius": 2500.0,
+    "pursuit_memory_window_seconds": 8.0,
+    "threat_window_seconds": 10.0
+  },
+  "objective_pressure": {
+    "tower_attack_range": 2400.0,
+    "core_attack_range": 2800.0,
+    "tower_standoff_distance": 1700.0,
+    "core_standoff_distance": 2100.0,
+    "objective_lane_spacing": 450.0
+  },
+  "movement": {
+    "stuck_sample_interval_seconds": 0.75,
+    "stuck_minimum_progress": 80.0,
+    "stuck_trigger_seconds": 1.5,
+    "unstick_duration_seconds": 1.1,
+    "unstick_lateral_distance": 650.0,
+    "unstick_backstep_distance": 250.0,
+    "route_stall_max_unstick_attempts": 5,
+    "objective_stall_lane_shift_attempts": 2,
+    "objective_stall_max_lane_shift": 3
+  },
+  "respawn": {
+    "respawn_seconds": 5.0
+  },
+  "telemetry_watch": [
+    "BotStuckRecovery",
+    "BotUnstickQuery",
+    "BotRouteWaypointAbandoned",
+    "BotObjectiveLaneShift",
+    "BotFiringPosition",
+    "BotNativePerception",
+    "BotFeatureCoverage"
+  ],
+  "iteration_notes": "v7 keeps v6 role behavior, route_stall_max_unstick_attempts=5, objective_stall_max_lane_shift=3, and objective_lane_spacing=450, then lowers only objective_stall_lane_shift_attempts from 3 to 2. Post-adoption v6 metadata showed objective stalls still clustered before the first lane shift: ObjectiveStuckContextLaneZeroCount=60 versus ObjectiveStuckContextShiftedCount=26, with all core/movement/objective feature canaries covered. Do not attribute v7 to live behavior until LatestBotStrategyTuningLoadedRevision equals this revision."
+}

@@ -1,0 +1,60 @@
+{
+  "schema": "tinyassets.game_factory.faction_palette.v1",
+  "authored_at_utc": "2026-05-24T11:30:00Z",
+  "author": "Rook (Claude Opus 4.7, Cowork background session)",
+  "source_contracts": [
+    "pages/plans/splitroot-polish-art-direction-2026-05-24.md",
+    "FactoryContracts/factions.json"
+  ],
+  "purpose": "Single source of truth for faction color triplets. Consumed by UArchonFactionMaterialBuilder (art-direction polish P1) and every UArchonFactionTintedWidget (UMG HUD polish H1). Promotes Hex's iteration-3 debug colors to canonical palette anchors. Locking these values prevents per-actor ad-hoc hex drift.",
+  "palette_slots": ["Primary", "Secondary", "Tertiary", "Accent"],
+  "factions": {
+    "VerdantChoir": {
+      "id": "verdant_choir",
+      "metallic": 0.1,
+      "roughness": 0.7,
+      "slots": {
+        "Primary":   { "hex": "#4D8C40", "linear": [0.30, 0.55, 0.25], "use": "foliage, banners, faction tint, blockout debug color (shipped)" },
+        "Secondary": { "hex": "#F5E8C8", "linear": [0.96, 0.91, 0.78], "use": "bone-cream highlights" },
+        "Tertiary":  { "hex": "#1C3A1F", "linear": [0.11, 0.23, 0.12], "use": "dark mossy depth, recess shadowing" },
+        "Accent":    { "hex": "#A8D060", "linear": [0.66, 0.82, 0.38], "use": "living-arrow tip glow, bright-leaf chartreuse for VFX/ability glows" }
+      }
+    },
+    "LenswrightCompact": {
+      "id": "lenswright_compact",
+      "metallic": 0.6,
+      "roughness": 0.3,
+      "no_gunpowder_audit": "Accent is alchemical cyan steady-state glow, NOT muzzle-flash orange. Reject any palette change that adds firearm hues.",
+      "slots": {
+        "Primary":   { "hex": "#8C4D26", "linear": [0.55, 0.30, 0.15], "use": "clockwork shell, riveted plate, blockout debug color (shipped)" },
+        "Secondary": { "hex": "#D9A86B", "linear": [0.85, 0.66, 0.42], "use": "polished brass highlights" },
+        "Tertiary":  { "hex": "#3D1F1A", "linear": [0.24, 0.12, 0.10], "use": "oxblood leather, deep iron" },
+        "Accent":    { "hex": "#5EC8E0", "linear": [0.37, 0.78, 0.88], "use": "pressure-bolt tracer mesh tint, alchemical glow (cyan, NOT flash)" }
+      }
+    },
+    "KinwildCovenant": {
+      "id": "kinwild_covenant",
+      "metallic": 0.2,
+      "roughness": 0.5,
+      "slots": {
+        "Primary":   { "hex": "#A6803E", "linear": [0.65, 0.50, 0.24], "use": "hide cloak, beast pelt, dust ochre" },
+        "Secondary": { "hex": "#7D8A8C", "linear": [0.49, 0.54, 0.55], "use": "cool grey hunter granite" },
+        "Tertiary":  { "hex": "#3B2810", "linear": [0.23, 0.16, 0.06], "use": "deep umber, char-burn shadow" },
+        "Accent":    { "hex": "#3F6E7A", "linear": [0.25, 0.43, 0.48], "use": "slate-blue ritual paint, ability marks" }
+      }
+    }
+  },
+  "neutral": {
+    "CoverStone":     { "hex": "#595959", "linear": [0.35, 0.35, 0.35], "use": "non-faction cover stones (shipped)" },
+    "SplitrootWood":  { "hex": "#735026", "linear": [0.45, 0.30, 0.15], "use": "central tree, root knee-walls, splitroot ruins (shipped)" },
+    "GroundEarth":    { "hex": "#6F6551", "linear": [0.16, 0.13, 0.08], "use": "loamy valley soil, one-place coherence", "note": "0.35/0.27/0.19 -> 0.16/0.13/0.08 retuned 2026-06-09 from rendered valley iteration 5; old value read as desert sand" },
+    "SkyHorizon":     { "hex": "#94A3A8", "linear": [0.58, 0.64, 0.66], "use": "overcast valley horizon tone" }
+  },
+  "lighting_anchor": {
+    "directional_light": { "pitch_deg": -25, "yaw_deg": 30, "color_linear": [1.0, 0.85, 0.7], "intensity_lux": 6.0 },
+    "sky_light":         { "intensity": 0.3 },
+    "exponential_fog":   { "density": 0.008, "color_linear": [0.42, 0.50, 0.55], "note": "0.05->0.008 retuned 2026-06-09 from first rendered valley playtest; 0.05 bleached the 400m valley" },
+    "post_process":      { "bloom": 0.4 }
+  },
+  "remix_rule": "Future games on the factory branch swap the 12 faction color values + neutral palette + lighting anchor. The slot count, the metallic/roughness pairing, and the no-gunpowder audit pattern are SUBSTRATE — not per-game."
+}

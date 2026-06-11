@@ -1,0 +1,915 @@
+{
+  "schema": "tinyassets.splitroot.unit_ledger.v1",
+  "authored_at_utc": "2026-06-11T17:16:22Z",
+  "owner_lane": "Ledger",
+  "purpose": "Per-game SPLITROOT unit ledger: roster slots, stats, mechanics, team use, shop-tech gating, and current visual asset selections.",
+  "approved_asset_registry": {
+    "human_view": "games/splitroot/FactoryContracts/approved_assets.html",
+    "data_source": "games/splitroot/FactoryContracts/approved_assets.data.js",
+    "unit_roster_view": "games/splitroot/FactoryContracts/unit_roster.html",
+    "unit_roster_data": "games/splitroot/FactoryContracts/unit_roster.data.js"
+  },
+  "claim_boundary": [
+    "Prototype stats are gameplay contracts for iteration, not final balance commitments.",
+    "A visual asset is only in-game when a local status, load log, proof artifact, or captured frame says so.",
+    "When a local C++ value conflicts with an older manifest note, this ledger records the current C++ value and keeps the conflict visible."
+  ],
+  "source_references": [
+    "pages/plans/archon-fantasy-rts-fps-v0-unit-sheet-2026-05-20.md",
+    "pages/plans/splitroot-c1-combat-fundamentals-contract-2026-05-24.md",
+    "pages/plans/splitroot-c2-verdant-thornsprout-bow-contract-2026-05-24.md",
+    "pages/plans/splitroot-c3-lenswright-units-ai-combat-contract-2026-05-24.md",
+    "pages/plans/splitroot-kinwild-bound-leap-contract-2026-05-24.md",
+    "pages/plans/splitroot-polish-art-direction-2026-05-24.md",
+    "drafts/plans/splitroot-item-shop-tech-building-direction-2026-06-11.md",
+    "games/splitroot/FactoryContracts/factions.json",
+    "games/splitroot/FactoryContracts/faction_silhouette.json",
+    "games/splitroot/FactoryContracts/approved_assets.data.js",
+    "games/splitroot/FactoryContracts/unit_asset_candidates.json",
+    "Coordination/asset-manifest.md",
+    "Source/ArchonFactoryCanary/Private/ArchonItemShopPolicyLibrary.cpp",
+    "Source/ArchonFactoryCanary/Private/ArchonLenswrightBracewrightActor.cpp",
+    "Source/ArchonFactoryCanary/Private/ArchonLenswrightSundialOpticActor.cpp",
+    "Source/ArchonFactoryCanary/Private/ArchonVerdantThornsproutBow.cpp",
+    "Source/ArchonFactoryCanary/Private/ArchonLenswrightPressureBoltCrossbow.cpp"
+  ],
+  "shared_combat_scale": {
+    "target_ttk_seconds": "3-6",
+    "baseline_walk_speed_units_per_second": 600,
+    "default_health_component_max_health": 150,
+    "ai_default_engage_range_units": 4000,
+    "ai_default_max_effective_fire_range_units": 5500
+  },
+  "weapon_profiles": {
+    "verdant_thornsprout_bow": {
+      "current_code_status": "shipped",
+      "shop_row_kind": "Item",
+      "shop_base_cost": 0,
+      "required_tech": null,
+      "quiver_capacity": 999,
+      "fire_cycle_seconds": 1.2,
+      "reload_seconds": 1.8,
+      "projectile_speed_units_per_second": 5600,
+      "max_range_units": 8000,
+      "damage": {
+        "body": 35,
+        "head": 80,
+        "limb": 22,
+        "falloff_start_units": 3000,
+        "falloff_end_units": 6000,
+        "min_damage": 12
+      },
+      "mechanics": [
+        "Unlimited practical quiver in current code; fire cycle is the actual rhythm gate.",
+        "Straight living-arrow projectile, visible and dodgeable after the current speed reduction.",
+        "Free basic item keeps a razed team able to fight."
+      ]
+    },
+    "pressure_bolt_crossbow": {
+      "current_code_status": "shipped",
+      "shop_row_kind": "Item",
+      "shop_base_cost": 100,
+      "required_tech": "armory",
+      "quiver_capacity": 1,
+      "fire_cycle_seconds": 1.5,
+      "reload_seconds": 2.2,
+      "projectile_speed_units_per_second": 6000,
+      "max_range_units": 6000,
+      "damage": {
+        "body": 40,
+        "head": 90,
+        "limb": 25,
+        "falloff_start_units": 2500,
+        "falloff_end_units": 5000,
+        "min_damage": 15
+      },
+      "mechanics": [
+        "Single pressure bolt with crank reload pacing.",
+        "Projectile speed is intentionally under the no-gunpowder hitscan-feel ceiling.",
+        "Lenswright presentation must read as pressure/clockwork/optics, never firearm or powder."
+      ]
+    }
+  },
+  "team_tech_buildings": [
+    {
+      "tech_id": "armory",
+      "display_name": "Armory",
+      "team_scope": "per-team built tech",
+      "current_build_target_id": "verdant_armory_slot",
+      "unlocks_shop_rows": [
+        "pressure_bolt_crossbow",
+        "lenswright_pressure_runner"
+      ],
+      "team_use": "Opens pressure-bolt ranged play and the first Lenswright body row. If destroyed, those rows lock again."
+    },
+    {
+      "tech_id": "beast_den",
+      "display_name": "Beast Den",
+      "team_scope": "per-team built tech",
+      "current_build_target_id": "kinwild_beast_den_slot",
+      "unlocks_shop_rows": [
+        "kinwild_spear_hunter",
+        "kinwild_pack_companion"
+      ],
+      "team_use": "Opens Kinwild pack pressure: a hunter body and a companion/scout row. This is the first fix for the old Kinwild no-units gap."
+    },
+    {
+      "tech_id": "grove",
+      "display_name": "Grove",
+      "team_scope": "per-team built tech",
+      "current_build_target_id": "verdant_grove_slot",
+      "unlocks_shop_rows": [
+        "verdant_temporary_runner"
+      ],
+      "team_use": "Opens Verdant body/item growth. Current row is a placeholder runner until a stronger organic Verdant asset lands."
+    }
+  ],
+  "approved_asset_pools": {
+    "global_asap": [
+      {
+        "name": "Infinity Blade Collection",
+        "url": "https://www.unrealengine.com/blog/free-infinity-blade-collection-marketplace-release",
+        "local_status": "approved_asap_blocked_not_locally_obtainable",
+        "intended_use": "Weapons, warriors, adversaries, effects, and faction-flavored shop visuals once entitlement/download is available."
+      }
+    ],
+    "verdant_choir": [
+      {
+        "name": "Paragon: The Fey",
+        "url": "https://www.fab.com/listings/9afbcde6-4a14-4018-95c3-2f3a2e1da858",
+        "use": "Briar Saint, grove caster, Verdant magic/nature silhouette."
+      },
+      {
+        "name": "Paragon: Morigesh",
+        "url": "https://www.fab.com/listings/29e67175-fa08-448f-822b-37f411530749",
+        "use": "Darker Verdant witch or sporecaster direction."
+      }
+    ],
+    "lenswright_compact": [
+      {
+        "name": "Paragon: Greystone",
+        "url": "https://www.fab.com/listings/122fd7bf-6f12-4304-a930-cccbbacdaebc",
+        "use": "Gearguard or heavy armored kit."
+      },
+      {
+        "name": "Paragon: Terra",
+        "url": "https://www.fab.com/listings/5ea6bcb6-e43e-4bbe-813f-c19d8c907565",
+        "use": "Shield/tank armor kit."
+      },
+      {
+        "name": "Paragon: Kwang",
+        "url": "https://www.fab.com/listings/f4c67e92-b976-4b5b-ab9f-4c25b010f6f3",
+        "use": "Disciplined melee body if Lenswright needs a close kit."
+      }
+    ],
+    "kinwild_covenant": [
+      {
+        "name": "Paragon: Khaimera",
+        "url": "https://www.fab.com/listings/e7c665c1-8c13-42f0-9152-0753008853d7",
+        "use": "Primary Kinwild hunter or beast-body candidate."
+      },
+      {
+        "name": "Paragon: Grux",
+        "url": "https://www.fab.com/listings/8c4bac2c-f7f7-4632-a644-47f4e104f5d8",
+        "use": "Heavy brawler creature kit."
+      },
+      {
+        "name": "Paragon: Rampage",
+        "url": "https://www.fab.com/listings/0807cf74-08fd-4a33-8c8d-f33c9439fb1f",
+        "use": "Late-tech creature tank or beast-form item."
+      },
+      {
+        "name": "Paragon: Narbash",
+        "url": "https://www.fab.com/listings/d8904a0e-9169-4763-b82b-5fcf864235a4",
+        "use": "Support, drummer, or aura kit."
+      }
+    ]
+  },
+  "factions": [
+    {
+      "faction_id": "VerdantChoir",
+      "display_name": "Verdant Choir",
+      "team_identity": "Terrain control, living arrows, root-vault mobility, bramble cover, grove healing, agile defenders.",
+      "silhouette_contract": "Vertical bias, rounded organic cap, right-side quiver/bramble protrusion, 1.05x capsule height.",
+      "units": [
+        {
+          "unit_id": "verdant_thornbound",
+          "display_name": "Thornbound",
+          "tier": "basic",
+          "current_status": "implemented_as_rts_squad_presence",
+          "shop": {
+            "row_id": "reinforcement_squad",
+            "row_kind": "Squad",
+            "catalog_base_cost": 150,
+            "required_tech": null,
+            "runtime_override_note": "Runtime proof flag ArchonRunRuntimeRallyProof lowers reinforcement cost to 5 supply; default match config and shop catalog still show 150."
+          },
+          "stats": {
+            "health": 150,
+            "move_speed_multiplier": 0.95,
+            "supply_cost": "low",
+            "range_role": "melee_frontline"
+          },
+          "mechanics": [
+            "Frontline melee escort.",
+            "Bramble guard/cover read.",
+            "Always-available basic body/squad so a losing team is not fully locked out.",
+            "Verdant-controlled body should use VerdantRootVault when a playable body version exists."
+          ],
+          "team_use": "Cheap durable screen that holds lanes, escorts ranged units, and buys time for grove or hero play.",
+          "asset_selection": {
+            "selected_candidate_id": null,
+            "selected_asset_name": null,
+            "selected_status": "unselected",
+            "current_placeholder": "AArchonCanaryRtsSquadActor / faction silhouette/debug presentation",
+            "approved_upgrade_pool": [
+              "Infinity Blade: Warriors",
+              "Infinity Blade: Adversaries"
+            ],
+            "notes": "Needs an organic melee body or armored thorn infantry asset."
+          }
+        },
+        {
+          "unit_id": "verdant_sporecaster",
+          "display_name": "Sporecaster",
+          "tier": "support_ranged",
+          "current_status": "spec_drafted",
+          "shop": {
+            "row_id": null,
+            "row_kind": "Unit",
+            "catalog_base_cost": null,
+            "required_tech": "grove"
+          },
+          "stats": {
+            "health": 90,
+            "move_speed_multiplier": 1.0,
+            "supply_cost": "medium",
+            "range_role": "ranged_support"
+          },
+          "mechanics": [
+            "Spore bolt harassment.",
+            "Spore bloom area support.",
+            "Softens clustered enemies and supports Thornbound pushes."
+          ],
+          "team_use": "Backline damage and area pressure behind Thornbound or grove cover.",
+          "asset_selection": {
+            "selected_candidate_id": null,
+            "selected_asset_name": null,
+            "selected_status": "unselected",
+            "current_placeholder": null,
+            "approved_upgrade_pool": [
+              "Paragon: Morigesh",
+              "Paragon: The Fey",
+              "Infinity Blade: Effects"
+            ],
+            "notes": "Morigesh is the best approved visual direction for a darker spore/witch read."
+          }
+        },
+        {
+          "unit_id": "verdant_grovekeeper",
+          "display_name": "Grovekeeper",
+          "tier": "tech_support",
+          "current_status": "spec_drafted",
+          "shop": {
+            "row_id": null,
+            "row_kind": "Unit",
+            "catalog_base_cost": null,
+            "required_tech": "grove"
+          },
+          "stats": {
+            "health": 110,
+            "move_speed_multiplier": 1.0,
+            "supply_cost": "medium_high",
+            "range_role": "support_control"
+          },
+          "mechanics": [
+            "Vine lash.",
+            "Growth pulse heal or cover sustain.",
+            "Grow cover patch for RTS/FPS lane shaping."
+          ],
+          "team_use": "Sustain and terrain control anchor for teams that invested in Grove.",
+          "asset_selection": {
+            "selected_candidate_id": null,
+            "selected_asset_name": null,
+            "selected_status": "unselected",
+            "current_placeholder": null,
+            "approved_upgrade_pool": [
+              "Paragon: The Fey",
+              "Infinity Blade: Effects"
+            ],
+            "notes": "The Fey is the strongest approved source for grove caster presentation."
+          }
+        },
+        {
+          "unit_id": "verdant_temporary_runner",
+          "display_name": "Temporary Verdant Runner",
+          "tier": "first_pass_shop_body",
+          "current_status": "shop_row_cataloged",
+          "shop": {
+            "row_id": "verdant_temporary_runner",
+            "row_kind": "Unit",
+            "catalog_base_cost": 100,
+            "required_tech": "grove"
+          },
+          "stats": {
+            "health": 100,
+            "move_speed_multiplier": 1.05,
+            "supply_cost": "prototype_100_shop_cost",
+            "range_role": "agile_placeholder"
+          },
+          "mechanics": [
+            "Placeholder agile Verdant body for proving tech-gated unit purchases.",
+            "Should eventually collapse into a real Thornbound, Sporecaster, Grovekeeper, or Verdant scout row."
+          ],
+          "team_use": "Short-term Grove unlock that proves the shop can sell a Verdant unit while better assets are sourced.",
+          "asset_selection": {
+            "selected_candidate_id": "fab_fantasy_game_character",
+            "selected_asset_name": "Fantasy Game Character",
+            "selected_status": "ue_imported_placeholder_only",
+            "current_game_paths": [
+              "/Game/Fab/Fantasy_Game_Character/fantasy_game_character_f",
+              "/Game/Fab/Fantasy_Game_Character/fantasy_game_character_f_Skeleton"
+            ],
+            "approved_upgrade_pool": [
+              "Paragon: The Fey",
+              "Paragon: Morigesh",
+              "Infinity Blade: Warriors"
+            ],
+            "notes": "AI-generated and zero reviews; use only as a temporary proof body, not faction identity."
+          }
+        },
+        {
+          "unit_id": "hero_briar_saint",
+          "display_name": "Briar Saint",
+          "tier": "hero",
+          "current_status": "contracted",
+          "shop": {
+            "row_id": null,
+            "row_kind": "Hero",
+            "catalog_base_cost": null,
+            "required_tech": "high_supply_unlock"
+          },
+          "stats": {
+            "health": 350,
+            "move_speed_multiplier": 1.15,
+            "weapon_multiplier": 1.3,
+            "supply_cost": "high_unlock",
+            "range_role": "hero_control_sustain"
+          },
+          "mechanics": [
+            "Thorn sweep / root snare lineage from the v0 unit sheet.",
+            "BriarWall: 6m wall, 200HP, 12s, vault-able by Verdant root-vault.",
+            "ChoirCircle: 12m radius, allies heal 5HP/s, enemies take 4 damage/s, 8s duration, 60s cooldown.",
+            "Paid hero discipline: horizontal variety only, no raw power sale."
+          ],
+          "team_use": "Late unlock Verdant anchor for sustain, cover, and decisive terrain control without breaking the horizontal-only hero rule.",
+          "asset_selection": {
+            "selected_candidate_id": null,
+            "selected_asset_name": null,
+            "selected_status": "unselected",
+            "current_placeholder": null,
+            "approved_upgrade_pool": [
+              "Paragon: The Fey",
+              "Infinity Blade: Warriors",
+              "Infinity Blade: Effects"
+            ],
+            "notes": "The Fey is the current best approved source candidate."
+          }
+        }
+      ]
+    },
+    {
+      "faction_id": "KinwildCovenant",
+      "display_name": "Kinwild Covenant",
+      "team_identity": "Pack pressure, bonded beasts, scouting, shock assaults, shapeshift bursts, bound-leap mobility.",
+      "silhouette_contract": "Forward-leaning hunter with cloak mantle and animal companion at the right hip.",
+      "units": [
+        {
+          "unit_id": "kinwild_spear_hunter",
+          "display_name": "Spear Hunter",
+          "tier": "tech_basic",
+          "current_status": "shop_row_cataloged_import_pending",
+          "shop": {
+            "row_id": "kinwild_spear_hunter",
+            "row_kind": "Unit",
+            "catalog_base_cost": 160,
+            "required_tech": "beast_den"
+          },
+          "stats": {
+            "health": 130,
+            "move_speed_multiplier": 1.1,
+            "supply_cost": "prototype_160_shop_cost",
+            "range_role": "melee_shock_hunter"
+          },
+          "mechanics": [
+            "Bound-leap mobility: 650 forward impulse, 400 vertical impulse, 0.33 stamina cost.",
+            "Bounding gait target speed 1150 while stamina allows.",
+            "Spear pressure and beast-pact melee identity.",
+            "Designed to close distance, flank ranged units, and punish isolated tech buildings."
+          ],
+          "team_use": "First real Kinwild body row. Gives Beast Den a readable offensive payoff and fixes the previous no-Kinwild-units gap.",
+          "asset_selection": {
+            "selected_candidate_id": "fab_lizard_kin_warrior",
+            "selected_asset_name": "Lizard Kin Warrior Character Rig",
+            "selected_status": "raw_source_present_import_pending",
+            "source_path": "Content/Fab_bf70b6c1_Lizard_Kin_Warrior_Character_Rig/glb/converted/lizard_kin_warrior_character_rig.glb",
+            "planned_game_path": "/Game/Fab/Library/Lizard_Kin_Warrior_Character_Rig",
+            "approved_upgrade_pool": [
+              "Paragon: Khaimera",
+              "Infinity Blade: Adversaries"
+            ],
+            "notes": "Best current Kinwild body candidate; needs safe UE import and animation/rig verification."
+          }
+        },
+        {
+          "unit_id": "kinwild_pack_companion",
+          "display_name": "Pack Companion",
+          "tier": "tech_companion",
+          "current_status": "shop_row_cataloged_import_pending",
+          "shop": {
+            "row_id": "kinwild_pack_companion",
+            "row_kind": "Unit",
+            "catalog_base_cost": 80,
+            "required_tech": "beast_den"
+          },
+          "stats": {
+            "health": 70,
+            "move_speed_multiplier": 1.25,
+            "supply_cost": "prototype_80_shop_cost",
+            "range_role": "scout_companion_melee"
+          },
+          "mechanics": [
+            "Companion silhouette reinforces Kinwild identity at distance.",
+            "Scout, reveal, chase, or bite-assist role depending on next implementation slice.",
+            "Pairs naturally with Spear Hunter for pack pressure."
+          ],
+          "team_use": "Cheap scouting and harassment body from Beast Den; helps Kinwild feel like a pack faction immediately.",
+          "asset_selection": {
+            "selected_candidate_id": "fab_low_poly_wolf",
+            "selected_asset_name": "Low Poly wolf",
+            "selected_status": "raw_source_present_import_pending",
+            "source_path": "Content/Fab_c5747f8f_Low_Poly_wolf/fbx/low_poly_wolf.fbx",
+            "planned_game_path": "/Game/Fab/Library/Low_Poly_wolf",
+            "approved_upgrade_pool": [
+              "Infinity Blade: Adversaries"
+            ],
+            "notes": "Useful gameplay-readable companion prototype; style may be too low-poly for final AAA target."
+          }
+        },
+        {
+          "unit_id": "kinwild_packcaller_tbd",
+          "display_name": "Pack Caller",
+          "tier": "hero_or_support_open_slot",
+          "current_status": "open_slot",
+          "shop": {
+            "row_id": null,
+            "row_kind": "HeroOrUnit",
+            "catalog_base_cost": null,
+            "required_tech": "beast_den_or_high_supply_unlock"
+          },
+          "stats": {
+            "health": 300,
+            "move_speed_multiplier": 1.05,
+            "supply_cost": "tbd",
+            "range_role": "aura_support_pack_anchor"
+          },
+          "mechanics": [
+            "Hunt horn / pack aura slot implied by Kinwild audio palette.",
+            "Should boost pack cohesion, reveal scent trails, or call a temporary beast pressure wave.",
+            "Needs connector-backed spec before implementation."
+          ],
+          "team_use": "Would give Kinwild a support/hero identity beyond raw melee pressure.",
+          "asset_selection": {
+            "selected_candidate_id": null,
+            "selected_asset_name": null,
+            "selected_status": "unselected",
+            "current_placeholder": null,
+            "approved_upgrade_pool": [
+              "Paragon: Narbash",
+              "Paragon: Khaimera",
+              "Paragon: Grux",
+              "Paragon: Rampage"
+            ],
+            "notes": "This is the most important Kinwild roster design gap after Spear Hunter and Companion."
+          }
+        }
+      ]
+    },
+    {
+      "faction_id": "LenswrightCompact",
+      "display_name": "Lenswright Compact",
+      "team_identity": "Pre-gunpowder science: pressure crossbows, clockwork, optics, field works, alchemy, siege tools.",
+      "silhouette_contract": "Wide anchored base, right-shoulder crossbow protrusion, reflective head-lens sphere. No gunpowder.",
+      "units": [
+        {
+          "unit_id": "lenswright_gearguard",
+          "display_name": "Gearguard",
+          "tier": "basic_frontline",
+          "current_status": "spec_drafted",
+          "shop": {
+            "row_id": null,
+            "row_kind": "Unit",
+            "catalog_base_cost": null,
+            "required_tech": null
+          },
+          "stats": {
+            "health": 140,
+            "move_speed_multiplier": 0.95,
+            "supply_cost": "low",
+            "range_role": "frontline_shield"
+          },
+          "mechanics": [
+            "Impact baton or pressure punch.",
+            "Brace shield.",
+            "Frontline holder for Lenswright ranged units."
+          ],
+          "team_use": "Bodyguard screen for Bracewright/Arbalist lines and field works.",
+          "asset_selection": {
+            "selected_candidate_id": null,
+            "selected_asset_name": null,
+            "selected_status": "unselected",
+            "current_placeholder": null,
+            "approved_upgrade_pool": [
+              "Paragon: Greystone",
+              "Paragon: Terra",
+              "Infinity Blade: Warriors"
+            ],
+            "notes": "Greystone or Terra are the best approved heavy-kit candidates."
+          }
+        },
+        {
+          "unit_id": "lenswright_bracewright",
+          "display_name": "Bracewright",
+          "tier": "ranged_basic",
+          "current_status": "implemented_debug_actor",
+          "shop": {
+            "row_id": "pressure_bolt_crossbow",
+            "row_kind": "ItemOrUnitLoadout",
+            "catalog_base_cost": 100,
+            "required_tech": "armory"
+          },
+          "stats": {
+            "health": 80,
+            "max_walk_speed_units_per_second": 360,
+            "move_speed_multiplier_vs_player_baseline": 0.6,
+            "supply_cost": "medium",
+            "range_role": "defensive_ranged"
+          },
+          "weapon": "pressure_bolt_crossbow",
+          "mechanics": [
+            "Defensive ranged AI.",
+            "Single pressure-bolt shot, 1.5s fire cycle, 2.2s reload.",
+            "Seeks cover under current AI combat policy thresholds.",
+            "No gunpowder, no firearms, no muzzle flashes."
+          ],
+          "team_use": "Armory payoff for a team that wants disciplined ranged pressure and cover-holding defense.",
+          "asset_selection": {
+            "selected_candidate_id": "fab_rogue_character_model",
+            "selected_asset_name": "Rogue Character Model",
+            "selected_status": "ue_imported_best_current_lenswright_placeholder",
+            "current_game_paths": [
+              "/Game/Fab/Library/Rogue_Character_Model/rogue_all",
+              "/Game/Fab/Library/Rogue_Character_Model/rogue_all_Skeleton"
+            ],
+            "approved_upgrade_pool": [
+              "Paragon: Greystone",
+              "Paragon: Terra",
+              "Paragon: Kwang",
+              "Infinity Blade: Warriors"
+            ],
+            "notes": "C++ actor currently uses debug basic-shape mesh; Rogue is the selected shop/body candidate for first visual swap."
+          }
+        },
+        {
+          "unit_id": "lenswright_sundial_optic",
+          "display_name": "Sundial Optic",
+          "tier": "scout",
+          "current_status": "implemented_debug_actor",
+          "shop": {
+            "row_id": null,
+            "row_kind": "Unit",
+            "catalog_base_cost": null,
+            "required_tech": "armory"
+          },
+          "stats": {
+            "health": 60,
+            "max_walk_speed_units_per_second": 420,
+            "move_speed_multiplier_vs_player_baseline": 0.7,
+            "vision_radius_units": 4500,
+            "supply_cost": "medium",
+            "range_role": "scout_no_weapon"
+          },
+          "mechanics": [
+            "ScoutNoWeapon AI role.",
+            "Long-vision optic unit with no ranged weapon at v0.",
+            "Should feed map-table information and enemy approach reads."
+          ],
+          "team_use": "Information advantage unit for Armory teams; lets Lenswright play around visibility and defensive preparation.",
+          "asset_selection": {
+            "selected_candidate_id": null,
+            "selected_asset_name": null,
+            "selected_status": "unselected",
+            "current_placeholder": "debug cylinder actor",
+            "approved_upgrade_pool": [
+              "fab_rogue_character_model",
+              "Infinity Blade: Warriors"
+            ],
+            "notes": "Needs optic head/spyglass prop treatment; Rogue may cover body only."
+          }
+        },
+        {
+          "unit_id": "lenswright_lens_arbalist",
+          "display_name": "Lens Arbalist",
+          "tier": "legacy_ranged",
+          "current_status": "legacy_archetype_partly_superseded_by_bracewright",
+          "shop": {
+            "row_id": null,
+            "row_kind": "Unit",
+            "catalog_base_cost": null,
+            "required_tech": "armory"
+          },
+          "stats": {
+            "health": 85,
+            "move_speed_multiplier": 1.0,
+            "supply_cost": "medium",
+            "range_role": "ranged_damage"
+          },
+          "mechanics": [
+            "Lens-guided bolt.",
+            "Focus shot.",
+            "Could merge with Bracewright or become a higher-damage arbalist variant."
+          ],
+          "team_use": "If kept separate, this becomes the damage counterpart to the defensive Bracewright.",
+          "asset_selection": {
+            "selected_candidate_id": null,
+            "selected_asset_name": null,
+            "selected_status": "unselected",
+            "current_placeholder": null,
+            "approved_upgrade_pool": [
+              "fab_rogue_character_model",
+              "Paragon: Kwang",
+              "Infinity Blade: Weapons"
+            ],
+            "notes": "Needs a decision: keep as a separate unit or fold into Bracewright."
+          }
+        },
+        {
+          "unit_id": "lenswright_fieldwright",
+          "display_name": "Fieldwright",
+          "tier": "tech_support",
+          "current_status": "spec_drafted",
+          "shop": {
+            "row_id": null,
+            "row_kind": "Unit",
+            "catalog_base_cost": null,
+            "required_tech": "armory"
+          },
+          "stats": {
+            "health": 100,
+            "move_speed_multiplier": 1.0,
+            "supply_cost": "medium_high",
+            "range_role": "engineer_support"
+          },
+          "mechanics": [
+            "Repair tool.",
+            "Wrench or spark prod self-defense.",
+            "Deploy pressure node or field-work support device."
+          ],
+          "team_use": "Keeps Lenswright buildings and siege tools alive; gives the team an engineering economy identity.",
+          "asset_selection": {
+            "selected_candidate_id": null,
+            "selected_asset_name": null,
+            "selected_status": "unselected",
+            "current_placeholder": null,
+            "approved_upgrade_pool": [
+              "fab_rogue_character_model",
+              "Infinity Blade: Warriors"
+            ],
+            "notes": "Needs tool/pack silhouette, not just a generic human body."
+          }
+        },
+        {
+          "unit_id": "lenswright_pressure_runner",
+          "display_name": "Pressure Runner",
+          "tier": "first_pass_shop_body",
+          "current_status": "shop_row_cataloged",
+          "shop": {
+            "row_id": "lenswright_pressure_runner",
+            "row_kind": "Unit",
+            "catalog_base_cost": 120,
+            "required_tech": "armory"
+          },
+          "stats": {
+            "health": 100,
+            "move_speed_multiplier": 1.15,
+            "supply_cost": "prototype_120_shop_cost",
+            "range_role": "skirmisher_scout"
+          },
+          "mechanics": [
+            "Prototype Lenswright shop body for proving unit purchases.",
+            "Should eventually express pressure-thrust mobility once that faction verb is contracted.",
+            "Can act as scout/skirmisher until Sundial and Bracewright visual swaps land."
+          ],
+          "team_use": "Fast Armory unit row for teams that want map pressure instead of only a weapon unlock.",
+          "asset_selection": {
+            "selected_candidate_id": "fab_rogue_character_model",
+            "selected_asset_name": "Rogue Character Model",
+            "selected_status": "ue_imported",
+            "current_game_paths": [
+              "/Game/Fab/Library/Rogue_Character_Model/rogue_all",
+              "/Game/Fab/Library/Rogue_Character_Model/rogue_all_Skeleton"
+            ],
+            "approved_upgrade_pool": [
+              "Paragon: Kwang",
+              "Infinity Blade: Warriors"
+            ],
+            "notes": "Best currently imported non-AI humanoid candidate for first Lenswright body work."
+          }
+        },
+        {
+          "unit_id": "hero_master_artificer",
+          "display_name": "Master Artificer",
+          "tier": "hero",
+          "current_status": "contracted",
+          "shop": {
+            "row_id": null,
+            "row_kind": "Hero",
+            "catalog_base_cost": null,
+            "required_tech": "high_supply_unlock"
+          },
+          "stats": {
+            "health": 280,
+            "move_speed_multiplier": 1.0,
+            "supply_cost": "high_unlock",
+            "range_role": "hero_device_artillery",
+            "reconcile_note": "Current local asset manifest names abilities but not a newer locked health value; old v0 unit sheet value 280 is retained here pending connector reconciliation."
+          },
+          "mechanics": [
+            "Pressure lance.",
+            "Deploy device/turret lineage.",
+            "Repair pulse.",
+            "PressureGate deploy: pad doubles pressure-thrust boost until destroyed.",
+            "OpticBarrage: 10m circle, 5 pressure-bolts over 4s, 35 damage each, explicitly not gunpowder."
+          ],
+          "team_use": "Late unlock siege/control hero for teams investing in Lenswright field works and pressure technology.",
+          "asset_selection": {
+            "selected_candidate_id": null,
+            "selected_asset_name": null,
+            "selected_status": "unselected",
+            "current_placeholder": null,
+            "approved_upgrade_pool": [
+              "Paragon: Greystone",
+              "Paragon: Terra",
+              "Infinity Blade: Warriors",
+              "Infinity Blade: Effects"
+            ],
+            "notes": "Needs heavy artificer silhouette plus no-gunpowder VFX audit."
+          }
+        }
+      ]
+    }
+  ],
+  "squad_packages": [
+    {
+      "squad_id": "reinforcement_squad",
+      "current_status": "implemented_runtime_purchase_and_fielding",
+      "shop_row_kind": "Squad",
+      "catalog_base_cost": 150,
+      "match_config_default_supply_cost": 150,
+      "runtime_proof_override_supply_cost": 5,
+      "squad_size": 2,
+      "required_tech": null,
+      "mechanics": [
+        "Team supply buys bodies through TryPurchaseReinforcement.",
+        "Runtime fielding spawns bots and logs ReinforcementPurchased/ReinforcementFielded.",
+        "TrainUnit RTS intent targets verdant_reinforcement_squad in current input bridge."
+      ],
+      "team_use": "Basic comeback-proof army fill. It keeps teams participating even when advanced tech rows are gone.",
+      "asset_selection": {
+        "selected_candidate_id": null,
+        "selected_asset_name": null,
+        "selected_status": "uses_current_bot_body_placeholder",
+        "notes": "Should eventually be faction-aware instead of always targeting verdant_reinforcement_squad."
+      }
+    },
+    {
+      "squad_id": "verdant_thornbound_squad",
+      "current_status": "v0_sheet_package",
+      "composition": [
+        {
+          "unit_id": "verdant_thornbound",
+          "count": 5
+        }
+      ],
+      "team_use": "Cheap line holder and first-60-seconds table command proof lineage."
+    },
+    {
+      "squad_id": "verdant_sporecaster_squad",
+      "current_status": "v0_sheet_package",
+      "composition": [
+        {
+          "unit_id": "verdant_sporecaster",
+          "count": 3
+        }
+      ],
+      "team_use": "Small ranged support group behind Thornbound."
+    },
+    {
+      "squad_id": "verdant_mixed_grove_squad",
+      "current_status": "v0_sheet_package",
+      "composition": [
+        {
+          "unit_id": "verdant_thornbound",
+          "count": 3
+        },
+        {
+          "unit_id": "verdant_sporecaster",
+          "count": 2
+        },
+        {
+          "unit_id": "verdant_grovekeeper",
+          "count": 1
+        }
+      ],
+      "team_use": "Self-sustaining Verdant push package after Grove."
+    },
+    {
+      "squad_id": "lenswright_gearguard_squad",
+      "current_status": "v0_sheet_package",
+      "composition": [
+        {
+          "unit_id": "lenswright_gearguard",
+          "count": 5
+        }
+      ],
+      "team_use": "Shield line for pressure-bolt units and field works."
+    },
+    {
+      "squad_id": "lenswright_ranged_squad",
+      "current_status": "v0_sheet_package",
+      "composition": [
+        {
+          "unit_id": "lenswright_lens_arbalist",
+          "count": 3
+        }
+      ],
+      "team_use": "Ranged Lenswright pressure package; may remap to Bracewright in current code."
+    },
+    {
+      "squad_id": "lenswright_field_column",
+      "current_status": "v0_sheet_package",
+      "composition": [
+        {
+          "unit_id": "lenswright_gearguard",
+          "count": 3
+        },
+        {
+          "unit_id": "lenswright_lens_arbalist",
+          "count": 2
+        },
+        {
+          "unit_id": "lenswright_fieldwright",
+          "count": 1
+        }
+      ],
+      "team_use": "Durable push column with repair and pressure-node support."
+    },
+    {
+      "squad_id": "kinwild_pack_pair",
+      "current_status": "ledger_new_package",
+      "composition": [
+        {
+          "unit_id": "kinwild_spear_hunter",
+          "count": 2
+        },
+        {
+          "unit_id": "kinwild_pack_companion",
+          "count": 2
+        }
+      ],
+      "team_use": "First Kinwild RTS package: fast flank, scout, chase, and tech-building harassment."
+    }
+  ],
+  "open_roster_decisions": [
+    {
+      "id": "lenswright_arbalist_vs_bracewright",
+      "decision_needed": "Keep Lens Arbalist as a separate damage unit, or make Bracewright the canonical ranged basic.",
+      "why_it_matters": "Avoid two nearly identical Lenswright crossbow bodies competing for asset and shop rows."
+    },
+    {
+      "id": "verdant_temporary_runner_destination",
+      "decision_needed": "Decide whether the temporary runner becomes a true Verdant scout, folds into Thornbound, or gets replaced by Sporecaster/Grovekeeper.",
+      "why_it_matters": "The selected AI-generated placeholder should not become a faction identity anchor by inertia."
+    },
+    {
+      "id": "kinwild_packcaller_spec",
+      "decision_needed": "Author the Kinwild support/hero slot around pack aura, scent reveal, or beast call.",
+      "why_it_matters": "Kinwild needs more than two Beast Den rows to stand as a complete faction."
+    },
+    {
+      "id": "reinforcement_squad_faction_awareness",
+      "decision_needed": "Make reinforcement training faction-aware instead of always targeting verdant_reinforcement_squad.",
+      "why_it_matters": "The shop and unit ledger now cover three factions; reinforcement intent still carries an early Verdant target id."
+    }
+  ]
+}

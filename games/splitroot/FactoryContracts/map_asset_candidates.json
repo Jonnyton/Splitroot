@@ -1,0 +1,230 @@
+{
+  "schema": "tinyassets.splitroot.map_asset_candidates.v1",
+  "authored_at_utc": "2026-06-11T18:55:00Z",
+  "owner_lane": "Quarry",
+  "purpose": "Operational map-art candidate inventory for SPLITROOT. This records free/premade assets already present locally, how they should be used at map scale, and the gameplay collision rules to prevent pretty meshes from creating invisible or misleading blockers.",
+  "live_canary_constraint": "Do not close or restart the live SPLITROOT canary from this lane. Source changes become match-visible only after the refresh/build lane safely rebuilds and hot-loads between matches.",
+  "local_scan": {
+    "content_root": "Content/Fab",
+    "uasset_count_observed": 333,
+    "scan_date_local": "2026-06-11",
+    "new_downloads_this_pass": []
+  },
+  "scale_reference": {
+    "player_capsule_height_units": 192,
+    "valley_half_extents_units": { "x": 18000, "y": 12000 },
+    "rule": "Landmarks must be many player-heights tall, walkable/cover objects must match their gameplay role, and decorative edge dressing must stay outside primary routes and replay hot zones."
+  },
+  "collision_policy": {
+    "nonblocking_decor": "DecorTree and DecorRock clusters are visual dressing only; collision disabled so they cannot trap players or squads.",
+    "cover_and_base_blockers": "Cover stones and base/camp silhouettes may block, but only when placed as explicit gameplay cover/objectives and kept out of primary route centers.",
+    "resource_sites": "ResourceSite meshes stay non-blocking. A player should be able to cross the visual footprint without being blocked by fountain or ruin geometry.",
+    "walkable_surfaces": "Do not place walkable-looking meshes as non-walkable platforms until their collision and step-up behavior are tested in a rendered playtest."
+  },
+  "current_splitroot_valley_pass": {
+    "pass_id": "quarry_lens_reseat_pass_20260611",
+    "workbench_variant": "lens_reseat",
+    "workbench_render": "Saved/Proof/MapWorkbench/splitroot-valley-lens_reseat.png",
+    "workbench_json": "Saved/Proof/MapWorkbench/splitroot-valley-lens_reseat.json",
+    "score": 100,
+    "map_read": [
+      "Lenswright base moved from the old NE replay-hot cluster to the far east corner at 14500,5200.",
+      "NE route bends under the hot cluster instead of crossing it.",
+      "Existing free Fab assets are now used as trees, ice shelves, ruined stone, snow rock cover, resource-site visuals, and camp silhouettes."
+    ]
+  },
+  "candidates": [
+    {
+      "id": "fab_english_oak_set",
+      "title": "English Oak Set",
+      "local_status": "ue_imported_wired",
+      "game_paths": [
+        "/Game/Fab/English_Oak/3_english_oak_set_quercus_robur_updated/StaticMeshes/Object_2",
+        "/Game/Fab/English_Oak/3_english_oak_set_quercus_robur_updated/StaticMeshes/Object_3",
+        "/Game/Fab/English_Oak/3_english_oak_set_quercus_robur_updated/StaticMeshes/Object_4",
+        "/Game/Fab/English_Oak/3_english_oak_set_quercus_robur_updated/StaticMeshes/Object_5",
+        "/Game/Fab/English_Oak/3_english_oak_set_quercus_robur_updated/StaticMeshes/Object_6"
+      ],
+      "current_use": "Deadwood west and southwest edge clusters in Splitroot Valley.",
+      "recommended_map_roles": ["forest edge massing", "line-of-sight softening", "biome identity"],
+      "relative_scale": "Use around 1.25-1.8 for tree dressing. Do not use as mountain or cover. The central Splitroot remains a separate many-player-height landmark.",
+      "collision_intent": "nonblocking_decor",
+      "risk": "Can reduce route readability if allowed into lanes; keep pushed away from primary routes and replay hot zones."
+    },
+    {
+      "id": "fab_old_stumps",
+      "title": "Old Green/Red Wood Stumps",
+      "local_status": "ue_imported_wired",
+      "game_paths": [
+        "/Game/Fab/Library/Old_green_stump/old_green_stump",
+        "/Game/Fab/Library/Old_red_wood_tree_stump/old_red_stump"
+      ],
+      "current_use": "Central Splitroot and fallback tree silhouettes.",
+      "recommended_map_roles": ["major tree landmark", "ancient root silhouette", "Verdant base identity"],
+      "relative_scale": "Only landmark usage should be enormous. Small stump usage must be visibly smaller than structures and outside traversal reads.",
+      "collision_intent": "landmark_or_nonblocking_decor_by_piece",
+      "risk": "Scaled-up stump collision must match visible trunk if used as a blocking landmark."
+    },
+    {
+      "id": "fab_wall_of_ice",
+      "title": "Wall of Ice",
+      "local_status": "ue_imported_wired",
+      "game_paths": [
+        "/Game/Fab/Library/Wall_of_ice/wall_of_ice/StaticMeshes/Object_2",
+        "/Game/Fab/Library/Wall_of_ice/wall_of_ice/StaticMeshes/Object_7",
+        "/Game/Fab/Library/Wall_of_ice/wall_of_ice/StaticMeshes/Object_8",
+        "/Game/Fab/Library/Wall_of_ice/wall_of_ice/StaticMeshes/Object_10",
+        "/Game/Fab/Library/Wall_of_ice/wall_of_ice/StaticMeshes/Object_12"
+      ],
+      "current_use": "North ridge/shelf dressing and some ridge fallback visuals.",
+      "recommended_map_roles": ["map boundary read", "north biome shelf", "large distant silhouette"],
+      "relative_scale": "Use large enough to read as terrain from across the valley. Never smaller than player scale when presented as cliff, ridge, or ice wall.",
+      "collision_intent": "edge_blocker_or_nonblocking_decor_by_piece",
+      "risk": "Complex collision on jagged ice is high-risk for invisible snagging; keep walkable routes away unless a rendered collision playtest proves it."
+    },
+    {
+      "id": "fab_castle_rocca_calascio",
+      "title": "Castle Rocca Calascio Ruins",
+      "local_status": "ue_imported_wired",
+      "game_paths": [
+        "/Game/Fab/Castle_Rocca_Calascio/castle_of_rocca_calascio/StaticMeshes/Object_4",
+        "/Game/Fab/Castle_Rocca_Calascio/castle_of_rocca_calascio/StaticMeshes/Object_5",
+        "/Game/Fab/Castle_Rocca_Calascio/castle_of_rocca_calascio/StaticMeshes/Object_6",
+        "/Game/Fab/Castle_Rocca_Calascio/castle_of_rocca_calascio/StaticMeshes/Object_11",
+        "/Game/Fab/Castle_Rocca_Calascio/castle_of_rocca_calascio/StaticMeshes/Object_13",
+        "/Game/Fab/Castle_Rocca_Calascio/castle_of_rocca_calascio/StaticMeshes/Object_14"
+      ],
+      "current_use": "Lenswright ruin stones and fallback rock/cover silhouettes.",
+      "recommended_map_roles": ["Lenswright ruin field", "ancient structure fragments", "nonblocking visual density"],
+      "relative_scale": "Use as medium-to-large ruin fragments. Avoid tiny fragments that read as pebbles beside the player.",
+      "collision_intent": "nonblocking_decor unless promoted to explicit cover",
+      "risk": "Ruin fragments look walkable; if collision blocks the player while visuals suggest a flat landing, demote to nonblocking decor or move out of traversal space."
+    },
+    {
+      "id": "fab_rock_terrain_light_snow",
+      "title": "Rock Terrain With Light Snow",
+      "local_status": "ue_imported_wired",
+      "game_paths": [
+        "/Game/Fab/Library/Rock_terrain_with_light_snow/rock_terrain_with_light_snow/StaticMeshes/Object_2",
+        "/Game/Fab/Library/Rock_terrain_with_light_snow/rock_terrain_with_light_snow/StaticMeshes/Object_3",
+        "/Game/Fab/Library/Rock_terrain_with_light_snow/rock_terrain_with_light_snow/StaticMeshes/Object_4",
+        "/Game/Fab/Library/Rock_terrain_with_light_snow/rock_terrain_with_light_snow/StaticMeshes/Object_6",
+        "/Game/Fab/Library/Rock_terrain_with_light_snow/rock_terrain_with_light_snow/StaticMeshes/Object_10"
+      ],
+      "current_use": "Cover stones, Kinwild stonebreak, ridge fallback, and snow rock dressing.",
+      "recommended_map_roles": ["vault cover", "stonebreak edge dressing", "snowy boundary accents"],
+      "relative_scale": "Cover stones should stay roughly one to three player-heights tall; decorative rocks can be smaller but must not masquerade as mountains.",
+      "collision_intent": "cover_and_base_blockers for CoverStone, nonblocking_decor for DecorRock",
+      "risk": "The same asset family is used for both blocking cover and visual dressing; piece type must drive collision, not asset path."
+    },
+    {
+      "id": "fab_medieval_fountain_empty_free",
+      "title": "Medieval Fountain Empty Free",
+      "local_status": "ue_imported_wired",
+      "game_paths": [
+        "/Game/Fab/Library/Medieval_Fountain_Empty_Free/medieval_fountain_empty_free/StaticMeshes/Object_2",
+        "/Game/Fab/Library/Medieval_Fountain_Empty_Free/medieval_fountain_empty_free/StaticMeshes/Object_3",
+        "/Game/Fab/Library/Medieval_Fountain_Empty_Free/medieval_fountain_empty_free/StaticMeshes/Object_4",
+        "/Game/Fab/Library/Medieval_Fountain_Empty_Free/medieval_fountain_empty_free/StaticMeshes/Object_5",
+        "/Game/Fab/Library/Medieval_Fountain_Empty_Free/medieval_fountain_empty_free/StaticMeshes/Object_6",
+        "/Game/Fab/Library/Medieval_Fountain_Empty_Free/medieval_fountain_empty_free/StaticMeshes/Object_7"
+      ],
+      "current_use": "Resource-site visual fallback.",
+      "recommended_map_roles": ["neutral resource pad read", "nonblocking objective marker"],
+      "relative_scale": "Current resource-site footprint is wide for map readability but collision stays off so the visual surface does not block traversal.",
+      "collision_intent": "resource_sites",
+      "risk": "If upgraded into capture-zone architecture, add explicit walkable collision tests before enabling blocking."
+    },
+    {
+      "id": "fab_fantastic_village_pack",
+      "title": "FANTASTIC Village Pack",
+      "local_status": "ue_imported_wired",
+      "game_paths": [
+        "/Game/Fab/FANTASTIC_Village_Pack/SM_BLD_body_v07_01",
+        "/Game/Fab/FANTASTIC_Village_Pack/SM_BLD_body_v04_01",
+        "/Game/Fab/FANTASTIC_Village_Pack/SM_BLD_body_v01_01",
+        "/Game/Fab/FANTASTIC_Village_Pack/SM_PROP_watchtower_wood_01",
+        "/Game/Fab/FANTASTIC_Village_Pack/SM_PROP_market_v01_01",
+        "/Game/Fab/FANTASTIC_Village_Pack/SM_PROP_wall_wood_gate_frame_01"
+      ],
+      "current_use": "Kinwild camp fallback silhouettes.",
+      "recommended_map_roles": ["camp buildings", "watchtower silhouettes", "market/yard dressing"],
+      "relative_scale": "Use as base/camp structures, not small props. Keep settlement masses off route centers and away from player-spawn starts.",
+      "collision_intent": "cover_and_base_blockers when used as base, otherwise nonblocking_decor",
+      "risk": "Stylization may drift lighter than the AAA target; useful now for readable settlement mass, replace later if a higher-quality free pack is approved."
+    },
+    {
+      "id": "fab_large_medieval_tavern_and_tavern_library",
+      "title": "Large Medieval Tavern + Tavern Library",
+      "local_status": "ue_imported_wired_partial",
+      "game_paths": [
+        "/Game/Fab/Large_Medieval_Building/large_medieval_tavern",
+        "/Game/Fab/Library/Tavern/tavern/StaticMeshes/Object_4"
+      ],
+      "current_use": "Kinwild camp fallback silhouettes.",
+      "recommended_map_roles": ["major camp anchor", "base silhouette", "future village POI"],
+      "relative_scale": "Large structures should read as buildings at many player-heights tall. Do not shrink to player-prop scale.",
+      "collision_intent": "cover_and_base_blockers only inside base territory",
+      "risk": "The tavern library contains many component meshes; use curated picks only after visual verification to avoid clutter and collision mismatch."
+    },
+    {
+      "id": "fab_forest_ground_soil_pine",
+      "title": "Forest Ground Soil Pine",
+      "local_status": "ue_imported_material_present",
+      "game_paths": [
+        "/Game/Fab/Forest_Ground_Soil_Pine/lesni_hlina",
+        "/Game/Fab/Forest_Ground_Soil_Pine/Material_u1_v1"
+      ],
+      "current_use": "Not yet wired into the Valley ground plane.",
+      "recommended_map_roles": ["ground material", "Verdant forest floor blend"],
+      "relative_scale": "Material only; tune tiling against the 36k x 24k valley so it does not look blurry or repetitive from FPS height.",
+      "collision_intent": "not_applicable_material",
+      "risk": "Needs material-slot verification in Unreal before claiming visual improvement."
+    },
+    {
+      "id": "fab_sacre_coeur_and_torre_ruins",
+      "title": "Sacre Coeur + Torre d'en Galmes Sala Hipostila",
+      "local_status": "ue_imported_unvetted",
+      "game_paths": [
+        "/Game/Fab/Library/Sacre_Coeur/Sacre_Coeur",
+        "/Game/Fab/Library/Torre_d_en_Galm_s_Sala_Hip_stila/model"
+      ],
+      "current_use": "Legacy Lenswright blockout reference only; not part of the current reseat pass.",
+      "recommended_map_roles": ["possible far-background monument", "possible ruin POI after visual check"],
+      "relative_scale": "Only use as large landmarks if they fit SPLITROOT identity. Avoid recognizable real-world-monument dominance in the main playable lane.",
+      "collision_intent": "unvetted_do_not_place_in_traversal",
+      "risk": "May be too recognizable, monolithic, or collision-heavy for the current map."
+    },
+    {
+      "id": "fab_windmill_and_architecture_planes",
+      "title": "Free Windmill Village + Fantasy Architecture W2R16",
+      "local_status": "ue_imported_unvetted_plane_assets",
+      "game_paths": [
+        "/Game/Fab/Free_Windmill_Village/FreeWindmillVillage_plane",
+        "/Game/Fab/Fantasy_Architecture_W2R16/FantasyArchitectureW2R16_plane"
+      ],
+      "current_use": "None.",
+      "recommended_map_roles": ["possible backdrop card", "possible distant village read after visual check"],
+      "relative_scale": "Treat as unverified until rendered. Plane assets can look flat from FPS view and should not be used as core map identity without inspection.",
+      "collision_intent": "nonblocking_backdrop_only_until_verified",
+      "risk": "May be image-card/plane content rather than usable 3D set dressing."
+    }
+  ],
+  "needed_after_current_local_assets": [
+    {
+      "need": "Higher-quality faction-base kits",
+      "reason": "Current free village/tavern assets give readable camp mass but are not yet distinct enough for Verdant/Lenswright/Kinwild identity.",
+      "download_rule": "Only add free assets with clear license/price evidence; send the URL before adding."
+    },
+    {
+      "need": "Walkable platform/bridge/ruin set with proven collision",
+      "reason": "The user reported walkable-looking surfaces blocking incorrectly. We need assets whose visual surfaces and collision can be trusted or quickly simplified.",
+      "download_rule": "Prefer free Unreal-native packs with collision documentation or simple modular meshes."
+    },
+    {
+      "need": "AAA-quality terrain material set",
+      "reason": "Ground currently depends on debug material plus one pine-soil candidate that still needs tiling/render verification.",
+      "download_rule": "Prefer free PBR terrain material packs with albedo/normal/roughness and UE material instances."
+    }
+  ]
+}

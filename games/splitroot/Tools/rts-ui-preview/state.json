@@ -1,0 +1,105 @@
+{
+  "faction": "VERDANT CHOIR",
+  "phase": "LIVE",
+  "clock": "04:37",
+  "resources": {
+    "gold": 420,
+    "lumber": 285,
+    "foodUsed": 38,
+    "foodCap": 60,
+    "upkeep": "NO UPKEEP",
+    "supply": 195,
+    "enemySupply": 120,
+    "score": "40-12",
+    "baseAlert": "BASE CLEAR"
+  },
+  "sites": {
+    "own": 2,
+    "enemy": 1,
+    "neutral": 0
+  },
+  "visibility": {
+    "lit": 5,
+    "fog": 3,
+    "black": 1,
+    "newlyLit": 2
+  },
+  "selection": {
+    "name": "CANARY SQUAD",
+    "type": "Infantry control group",
+    "controlGroup": "1",
+    "portrait": "THORN CAPTAIN",
+    "level": 3,
+    "damage": "18-24",
+    "armor": 2,
+    "range": "Melee + support",
+    "health": 574,
+    "maxHealth": 630,
+    "mana": 83,
+    "maxMana": 140,
+    "stance": "Attack-move rally",
+    "selected": 1,
+    "units": 4,
+    "lastTarget": "850,-260,120",
+    "orders": 7,
+    "widgetOrders": 3,
+    "sequence": 14
+  },
+  "production": {
+    "train": "READY",
+    "trainCost": 150,
+    "armory": "BUILT",
+    "crossbow": "UNLOCKED",
+    "queue": [
+      { "name": "THORNBOUND", "progress": 0.62 },
+      { "name": "WARD ROOT", "progress": 0.18 }
+    ]
+  },
+  "units": [
+    { "name": "THORN 1", "role": "front", "hp": 150, "maxHp": 150, "mana": 0, "maxMana": 0, "state": "moving" },
+    { "name": "THORN 2", "role": "front", "hp": 122, "maxHp": 150, "mana": 0, "maxMana": 0, "state": "moving" },
+    { "name": "ROOT", "role": "anchor", "hp": 210, "maxHp": 210, "mana": 35, "maxMana": 60, "state": "guarding" },
+    { "name": "WARD", "role": "support", "hp": 92, "maxHp": 120, "mana": 48, "maxMana": 80, "state": "channeling" }
+  ],
+  "commandLog": [
+    "04:37 TRAIN verdant_reinforcement_squad accepted",
+    "04:31 RALLY command_card_rally accepted",
+    "04:22 BUILD armory accepted"
+  ],
+  "mapCells": [
+    "black", "fog", "lit", "fog",
+    "fog", "lit", "own", "lit",
+    "lit", "own", "lit", "enemy",
+    "lit", "neutral", "fog", "enemy"
+  ],
+  "minimapSignals": [
+    { "x": 68, "y": 54, "type": "ping" },
+    { "x": 82, "y": 72, "type": "attack" },
+    { "x": 46, "y": 48, "type": "camera" }
+  ],
+  "controlGroups": [
+    { "key": "1", "label": "Canary", "active": true },
+    { "key": "2", "label": "Root", "active": false },
+    { "key": "3", "label": "Builder", "active": false },
+    { "key": "F1", "label": "Hero", "active": false }
+  ],
+  "commands": [
+    { "key": "E", "name": "Move", "detail": "ground", "enabled": true, "kind": "order" },
+    { "key": "LMB", "name": "Attack", "detail": "target", "enabled": true, "kind": "order" },
+    { "key": "R", "name": "Rally", "detail": "point", "enabled": true, "kind": "order" },
+    { "key": "TAB", "name": "Leave", "detail": "return FPS", "enabled": true, "kind": "hybrid" },
+    { "key": "B", "name": "Train", "detail": "150 supply", "enabled": true, "kind": "train", "cost": "150s" },
+    { "key": "T", "name": "Build", "detail": "selected tech", "enabled": true, "kind": "build" },
+    { "key": "C", "name": "Tech", "detail": "cycle", "enabled": true, "kind": "build" },
+    { "key": "F", "name": "Take Unit", "detail": "before table", "enabled": false, "kind": "hybrid" },
+    { "key": "S", "name": "Stop", "detail": "next", "enabled": false, "kind": "order" },
+    { "key": "H", "name": "Hold", "detail": "next", "enabled": false, "kind": "order" },
+    { "key": "P", "name": "Patrol", "detail": "next", "enabled": false, "kind": "order" },
+    { "key": "X", "name": "Ping", "detail": "next", "enabled": false, "kind": "signal" }
+  ],
+  "worldEvents": [
+    { "type": "skirmish", "x": 62, "y": 34, "label": "tower fire" },
+    { "type": "move", "x": 48, "y": 54, "label": "squad path" },
+    { "type": "alert", "x": 73, "y": 62, "label": "enemy patrol" }
+  ]
+}

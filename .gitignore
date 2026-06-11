@@ -1,0 +1,52 @@
+# Unreal generated output
+/Binaries/
+/Build/
+/DerivedDataCache/
+/Intermediate/
+/Saved/
+/Script/
+
+# IDE/editor state
+/.vs/
+/.vscode/
+/.idea/
+*.sln
+*.suo
+*.opensdf
+*.sdf
+*.VC.db
+*.VC.opendb
+
+# Logs, crash dumps, and local diagnostics
+*.log
+*.dmp
+*.tmp
+*.bak
+
+# Python/Node generated files used by proof tooling
+__pycache__/
+*.py[cod]
+node_modules/
+dist/
+coverage/
+
+# Local environment and credentials
+.env
+.env.*
+*.pem
+*.pfx
+*.key
+
+# OS noise
+Thumbs.db
+.DS_Store
+
+# Public GitHub boundary:
+# Raw Fab/vendor drops are local cache material and include files larger than
+# GitHub's normal blob limit. Keep source contracts and small canary fixtures in
+# Git; restore licensed/vendor assets through local asset import workflows.
+/Content/Fab/
+/Content/Fab_*/
+
+# Generated catalog previews are useful proof artifacts, not source of truth.
+/games/splitroot/FactoryContracts/thumbs/generated/

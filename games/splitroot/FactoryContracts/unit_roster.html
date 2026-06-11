@@ -1,0 +1,816 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SPLITROOT Unit and Item Roster</title>
+  <style>
+    :root {
+      --bg: #f4f1ea;
+      --paper: #fffdf8;
+      --ink: #1f2324;
+      --muted: #626867;
+      --line: #d8d0c1;
+      --soft: #ebe5d8;
+      --dark: #263736;
+      --verdant: #2f6f53;
+      --kinwild: #8b6828;
+      --lens: #1f6d7a;
+      --danger: #914535;
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Segoe UI", Arial, sans-serif;
+      line-height: 1.4;
+    }
+
+    header {
+      background: var(--paper);
+      border-bottom: 1px solid var(--line);
+      padding: 24px 28px 16px;
+    }
+
+    .nav,
+    .tabs,
+    .filters {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .nav { margin-bottom: 14px; }
+
+    a {
+      color: #0f5d73;
+      text-decoration: none;
+      overflow-wrap: anywhere;
+    }
+
+    a:hover { text-decoration: underline; }
+
+    .nav a,
+    .tabs button,
+    .filters button {
+      border: 1px solid #bdb4a3;
+      background: #fffefb;
+      color: #173f47;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font: inherit;
+      cursor: pointer;
+      max-width: 100%;
+    }
+
+    .tabs button.active,
+    .filters button.active {
+      color: #fff;
+      background: var(--dark);
+      border-color: var(--dark);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 34px;
+      line-height: 1.15;
+      letter-spacing: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .lede {
+      margin: 0;
+      max-width: 1040px;
+      color: var(--muted);
+      overflow-wrap: anywhere;
+    }
+
+    .tabs {
+      position: sticky;
+      top: 0;
+      z-index: 4;
+      padding: 12px 28px;
+      background: #e9e2d3;
+      border-bottom: 1px solid var(--line);
+    }
+
+    main { padding: 18px 28px 44px; }
+
+    .view[hidden] { display: none; }
+
+    .identity-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .identity {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .identity h2,
+    .faction-head h2 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: 0;
+    }
+
+    .identity h2 {
+      padding: 10px 12px 0;
+    }
+
+    .identity p {
+      margin: 4px 12px 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .VerdantChoir .accent,
+    .VerdantChoir .faction-head { background: var(--verdant); }
+    .KinwildCovenant .accent,
+    .KinwildCovenant .faction-head { background: var(--kinwild); }
+    .LenswrightCompact .accent,
+    .LenswrightCompact .faction-head { background: var(--lens); }
+
+    .accent {
+      height: 6px;
+      width: 100%;
+    }
+
+    .matrix {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      overflow: hidden;
+    }
+
+    .matrix-head,
+    .matrix-row {
+      display: grid;
+      grid-template-columns: 150px repeat(3, minmax(0, 1fr));
+      min-width: 0;
+    }
+
+    .matrix-head {
+      background: #ded7c8;
+      border-bottom: 1px solid var(--line);
+      font-weight: 700;
+    }
+
+    .matrix-head div,
+    .role-cell,
+    .faction-cell {
+      padding: 10px;
+      border-right: 1px solid var(--line);
+      min-width: 0;
+    }
+
+    .matrix-head div:last-child,
+    .faction-cell:last-child { border-right: 0; }
+
+    .matrix-row { border-bottom: 1px solid var(--line); }
+    .matrix-row:last-child { border-bottom: 0; }
+
+    .role-cell {
+      background: #f7f4ee;
+      color: #303636;
+      font-weight: 700;
+    }
+
+    .faction-cell {
+      display: grid;
+      gap: 8px;
+      align-content: start;
+    }
+
+    .empty {
+      color: var(--muted);
+      font-size: 13px;
+      border: 1px dashed #c9c0b0;
+      border-radius: 6px;
+      padding: 8px;
+      background: #faf7ef;
+    }
+
+    .mini,
+    .detail,
+    .item-card,
+    .node {
+      border: 1px solid #ded6c8;
+      border-radius: 8px;
+      background: #fffefb;
+      min-width: 0;
+    }
+
+    .mini {
+      display: grid;
+      grid-template-columns: 58px minmax(0, 1fr);
+      gap: 8px;
+      padding: 7px;
+    }
+
+    .mini h3,
+    .detail h3,
+    .item-card h3,
+    .node h3 {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.25;
+      letter-spacing: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .thumb {
+      width: 58px;
+      height: 46px;
+      border-radius: 6px;
+      background: #2a2e2d;
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+      color: #f7f0dd;
+      font-size: 11px;
+      text-align: center;
+    }
+
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 5px;
+    }
+
+    .chip {
+      border: 1px solid #d2c8b7;
+      background: var(--soft);
+      border-radius: 6px;
+      padding: 2px 6px;
+      font-size: 12px;
+      max-width: 100%;
+      overflow-wrap: anywhere;
+    }
+
+    .chip.unit { background: #e2eadb; }
+    .chip.item { background: #ddecee; }
+    .chip.hero { background: #f0ded5; color: #713522; }
+    .chip.squad { background: #e8e0f1; }
+    .chip.open { background: #f6ead0; }
+    .chip.warn { background: #f5e1d8; border-color: #c99b8e; color: #743321; }
+    .chip.local { background: #dfeee7; border-color: #a9c9b7; color: #1f553c; }
+
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .faction {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .faction-head {
+      color: #fff;
+      padding: 12px;
+    }
+
+    .faction-head p {
+      margin: 4px 0 0;
+      color: rgba(255,255,255,0.92);
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    .path {
+      border-top: 1px solid var(--line);
+      padding: 12px;
+    }
+
+    .path h3 {
+      margin: 0 0 4px;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    .path p {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    .node {
+      padding: 9px;
+      margin-top: 8px;
+      display: grid;
+      grid-template-columns: 58px minmax(0, 1fr);
+      gap: 8px;
+    }
+
+    .filters { margin-bottom: 12px; }
+
+    .detail-grid,
+    .item-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(360px, 100%), 1fr));
+      gap: 12px;
+    }
+
+    .detail,
+    .item-card { padding: 12px; }
+
+    .detail-head,
+    .item-head {
+      display: grid;
+      grid-template-columns: 92px minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
+      margin-bottom: 9px;
+    }
+
+    .detail .thumb,
+    .item-card .thumb {
+      width: 92px;
+      height: 72px;
+    }
+
+    dl {
+      margin: 0;
+      display: grid;
+      gap: 6px;
+    }
+
+    dt {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    dd {
+      margin: 0;
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    .assets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .assets a {
+      font-size: 12px;
+      border-bottom: 1px solid transparent;
+    }
+
+    .assets a:hover {
+      text-decoration: none;
+      border-bottom-color: #0f5d73;
+    }
+
+    .open-decisions {
+      margin-top: 20px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      padding: 14px;
+    }
+
+    .open-decisions h2 { margin: 0 0 8px; }
+    .open-decisions ul { margin: 0; padding-left: 20px; }
+
+    @media (max-width: 1180px) {
+      .identity-strip,
+      .tech-grid { grid-template-columns: 1fr; }
+
+      .matrix-head { display: none; }
+      .matrix-row {
+        grid-template-columns: 1fr;
+      }
+      .role-cell,
+      .faction-cell {
+        border-right: 0;
+      }
+      .faction-cell {
+        border-top: 1px solid #eee5d5;
+      }
+      .faction-cell::before {
+        content: attr(data-faction);
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      header,
+      main,
+      .tabs {
+        width: 100vw;
+        max-width: 100vw;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      h1 { max-width: 13ch; font-size: 26px; }
+      .lede { max-width: 32ch; }
+      .nav,
+      .tabs,
+      .filters { gap: 8px; }
+      .nav a,
+      .tabs button,
+      .filters button { font-size: 14px; padding: 7px 9px; }
+      .detail-head,
+      .item-head,
+      .node,
+      .mini { grid-template-columns: 1fr; }
+      .thumb,
+      .detail .thumb,
+      .item-card .thumb {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 16 / 9;
+      }
+      .faction-head p,
+      .path p,
+      dd { max-width: 32ch; }
+    }
+  </style>
+  <script src="approved_assets.data.js"></script>
+  <script src="unit_roster.data.js"></script>
+</head>
+<body>
+  <header>
+    <nav class="nav" aria-label="Registry navigation">
+      <a href="approved_assets.html">Approved Asset Browser</a>
+      <a href="unit_ledger.md">Unit Ledger Markdown</a>
+      <a href="unit_ledger.json">Unit Ledger JSON</a>
+    </nav>
+    <h1>SPLITROOT Unit and Item Roster</h1>
+    <p class="lede">Standing roster workbench for faction roles, tech gates, balance notes, item upgrades, and current visual asset choices.</p>
+  </header>
+
+  <section class="tabs" aria-label="Roster views">
+    <button class="active" data-view="matrix">Role Matrix</button>
+    <button data-view="tech">Tech Paths</button>
+    <button data-view="details">Unit Cards</button>
+    <button data-view="items">Items</button>
+  </section>
+
+  <main>
+    <section class="view" id="view-matrix"></section>
+    <section class="view" id="view-tech" hidden></section>
+    <section class="view" id="view-details" hidden></section>
+    <section class="view" id="view-items" hidden></section>
+    <section class="open-decisions">
+      <h2>Open Decisions</h2>
+      <ul id="decisions"></ul>
+    </section>
+  </main>
+
+  <script>
+    const roster = window.SPLITROOT_UNIT_ROSTER;
+    const approved = window.SPLITROOT_APPROVED_ASSETS;
+    const assetsById = new Map(approved.assets.map(asset => [asset.id, asset]));
+    const factionLabels = new Map(roster.factions.map(faction => [faction.id, faction.label]));
+    let activeFaction = "all";
+
+    const roleOrder = [
+      { id: "frontline", label: "Frontline / Screen" },
+      { id: "ranged", label: "Ranged Damage" },
+      { id: "scout", label: "Scout / Vision" },
+      { id: "support", label: "Support / Engineer" },
+      { id: "item", label: "Item / Weapon Upgrade" },
+      { id: "squad", label: "Squad Package" },
+      { id: "hero", label: "Hero / High Supply" },
+      { id: "open", label: "Open Slot" }
+    ];
+
+    function allEntries() {
+      return roster.factions.flatMap(faction =>
+        faction.tech_paths.flatMap((path, pathIndex) =>
+          path.entries.map(entry => ({
+            ...entry,
+            faction,
+            path,
+            path_index: pathIndex,
+            role_family: roleFamily(entry)
+          }))
+        )
+      );
+    }
+
+    function roleFamily(entry) {
+      const text = `${entry.type} ${entry.role} ${entry.name}`.toLowerCase();
+      if (entry.type === "item") return "item";
+      if (entry.type === "hero") return "hero";
+      if (entry.type === "squad") return "squad";
+      if (entry.type === "open" || text.includes("tbd")) return "open";
+      if (text.includes("scout") || text.includes("vision") || text.includes("runner")) return "scout";
+      if (text.includes("support") || text.includes("engineer") || text.includes("caster") || text.includes("keeper")) return "support";
+      if (text.includes("ranged") || text.includes("arbalist") || text.includes("crossbow")) return "ranged";
+      return "frontline";
+    }
+
+    function primaryAsset(entry) {
+      return (entry.asset_ids || []).map(id => assetsById.get(id)).find(Boolean);
+    }
+
+    function thumbnailStatus(asset) {
+      if (!asset) return "";
+      return `${asset.thumbnail_status || ""} ${asset.thumbnail_quality || ""}`.toLowerCase();
+    }
+
+    function thumb(entry, large = false) {
+      const asset = primaryAsset(entry);
+      const box = document.createElement("div");
+      box.className = "thumb";
+      if (asset && asset.thumbnail) {
+        const img = document.createElement("img");
+        img.loading = "lazy";
+        img.alt = asset.title;
+        img.src = asset.thumbnail;
+        box.appendChild(img);
+      } else {
+        box.textContent = entry.type;
+      }
+      return box;
+    }
+
+    function chip(text, extraClass = "") {
+      const span = document.createElement("span");
+      span.className = `chip ${extraClass}`.trim();
+      span.textContent = text;
+      return span;
+    }
+
+    function statusChips(entry) {
+      const asset = primaryAsset(entry);
+      const chips = [
+        chip(entry.type, entry.type),
+        chip(entry.gate),
+        chip(entry.cost)
+      ];
+      const status = thumbnailStatus(asset);
+      if (status.includes("local_preview") || status.includes("render_from_imported")) {
+        chips.push(chip("local visual", "local"));
+      }
+      if (status.includes("blocked") || (entry.visual_status || "").toLowerCase().includes("no actual")) {
+        chips.push(chip("render needed", "warn"));
+      }
+      return chips;
+    }
+
+    function miniCard(entry) {
+      const card = document.createElement("article");
+      card.className = "mini";
+      card.appendChild(thumb(entry));
+      const body = document.createElement("div");
+      const title = document.createElement("h3");
+      title.textContent = entry.name;
+      const meta = document.createElement("div");
+      meta.className = "meta";
+      statusChips(entry).forEach(c => meta.appendChild(c));
+      body.append(title, meta);
+      card.appendChild(body);
+      return card;
+    }
+
+    function assetLinks(entry) {
+      const wrap = document.createElement("div");
+      wrap.className = "assets";
+      (entry.asset_ids || []).forEach(id => {
+        const asset = assetsById.get(id);
+        if (!asset) return;
+        const link = document.createElement("a");
+        link.href = asset.url;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = asset.title;
+        wrap.appendChild(link);
+      });
+      return wrap;
+    }
+
+    function identityStrip() {
+      const wrap = document.createElement("section");
+      wrap.className = "identity-strip";
+      roster.factions.forEach(faction => {
+        const card = document.createElement("article");
+        card.className = `identity ${faction.id}`;
+        card.innerHTML = `<div class="accent"></div><h2>${faction.label}</h2><p>${faction.identity}<br>Movement: ${faction.movement}</p>`;
+        wrap.appendChild(card);
+      });
+      return wrap;
+    }
+
+    function renderMatrix() {
+      const root = document.getElementById("view-matrix");
+      const matrix = document.createElement("section");
+      matrix.className = "matrix";
+
+      const head = document.createElement("div");
+      head.className = "matrix-head";
+      head.appendChild(document.createElement("div")).textContent = "Role";
+      roster.factions.forEach(faction => {
+        const cell = document.createElement("div");
+        cell.textContent = faction.label;
+        head.appendChild(cell);
+      });
+      matrix.appendChild(head);
+
+      const entries = allEntries();
+      roleOrder.forEach(role => {
+        const row = document.createElement("div");
+        row.className = "matrix-row";
+        const roleCell = document.createElement("div");
+        roleCell.className = "role-cell";
+        roleCell.textContent = role.label;
+        row.appendChild(roleCell);
+
+        roster.factions.forEach(faction => {
+          const cell = document.createElement("div");
+          cell.className = "faction-cell";
+          cell.dataset.faction = faction.label;
+          const matches = entries.filter(entry => entry.role_family === role.id && entry.faction.id === faction.id);
+          if (matches.length === 0) {
+            const empty = document.createElement("div");
+            empty.className = "empty";
+            empty.textContent = "Gap";
+            cell.appendChild(empty);
+          } else {
+            matches.forEach(entry => cell.appendChild(miniCard(entry)));
+          }
+          row.appendChild(cell);
+        });
+        matrix.appendChild(row);
+      });
+
+      root.replaceChildren(identityStrip(), matrix);
+    }
+
+    function factionColumn(faction) {
+      const section = document.createElement("section");
+      section.className = `faction ${faction.id}`;
+      const head = document.createElement("div");
+      head.className = "faction-head";
+      head.innerHTML = `<h2>${faction.label}</h2><p>${faction.identity}</p><p>Movement: ${faction.movement}</p>`;
+      section.appendChild(head);
+
+      faction.tech_paths.forEach(path => {
+        const block = document.createElement("div");
+        block.className = "path";
+        const title = document.createElement("h3");
+        title.textContent = path.label;
+        const summary = document.createElement("p");
+        summary.textContent = path.role_summary;
+        block.append(title, summary, ...path.entries.map(entry => miniCard({
+          ...entry,
+          faction,
+          path,
+          role_family: roleFamily(entry)
+        })));
+        section.appendChild(block);
+      });
+
+      return section;
+    }
+
+    function renderTech() {
+      const root = document.getElementById("view-tech");
+      const grid = document.createElement("section");
+      grid.className = "tech-grid";
+      roster.factions.forEach(faction => grid.appendChild(factionColumn(faction)));
+      root.replaceChildren(grid);
+    }
+
+    function detailCard(entry) {
+      const card = document.createElement("article");
+      card.className = "detail";
+      const head = document.createElement("div");
+      head.className = "detail-head";
+      const titleWrap = document.createElement("div");
+      const title = document.createElement("h3");
+      title.textContent = entry.name;
+      const meta = document.createElement("div");
+      meta.className = "meta";
+      [chip(factionLabels.get(entry.faction.id)), ...statusChips(entry), chip(entry.path.label)].forEach(c => meta.appendChild(c));
+      titleWrap.append(title, meta);
+      head.append(thumb(entry, true), titleWrap);
+      card.appendChild(head);
+
+      const dl = document.createElement("dl");
+      [
+        ["Role", entry.role],
+        ["Stats", entry.stats],
+        ["Mechanics", entry.mechanics],
+        ["Team use", entry.team_use],
+        ["Asset status", entry.asset_status],
+        ["Visual status", entry.visual_status || (primaryAsset(entry) || {}).thumbnail_note || ""]
+      ].filter(([, value]) => value).forEach(([label, value]) => {
+        const dt = document.createElement("dt");
+        dt.textContent = label;
+        const dd = document.createElement("dd");
+        dd.textContent = value;
+        dl.append(dt, dd);
+      });
+      card.append(dl, assetLinks(entry));
+      return card;
+    }
+
+    function filterButtons() {
+      const wrap = document.createElement("div");
+      wrap.className = "filters";
+      [["all", "All"], ...roster.factions.map(f => [f.id, f.label])].forEach(([id, label]) => {
+        const button = document.createElement("button");
+        button.textContent = label;
+        button.classList.toggle("active", id === activeFaction);
+        button.addEventListener("click", () => {
+          activeFaction = id;
+          renderDetails();
+        });
+        wrap.appendChild(button);
+      });
+      return wrap;
+    }
+
+    function renderDetails() {
+      const root = document.getElementById("view-details");
+      const grid = document.createElement("section");
+      grid.className = "detail-grid";
+      allEntries()
+        .filter(entry => activeFaction === "all" || entry.faction.id === activeFaction)
+        .forEach(entry => grid.appendChild(detailCard(entry)));
+      root.replaceChildren(filterButtons(), grid);
+    }
+
+    function renderItems() {
+      const root = document.getElementById("view-items");
+      const grid = document.createElement("section");
+      grid.className = "item-grid";
+      allEntries()
+        .filter(entry => entry.type === "item")
+        .forEach(entry => {
+          const card = detailCard(entry);
+          card.className = "item-card";
+          grid.appendChild(card);
+        });
+      root.replaceChildren(grid);
+    }
+
+    function renderDecisions() {
+      document.getElementById("decisions").replaceChildren(...roster.open_decisions.map(text => {
+        const li = document.createElement("li");
+        li.textContent = text;
+        return li;
+      }));
+    }
+
+    function setView(id) {
+      document.querySelectorAll(".tabs button").forEach(button => {
+        button.classList.toggle("active", button.dataset.view === id);
+      });
+      ["matrix", "tech", "details", "items"].forEach(view => {
+        document.getElementById(`view-${view}`).hidden = view !== id;
+      });
+    }
+
+    document.querySelectorAll(".tabs button").forEach(button => {
+      button.addEventListener("click", () => setView(button.dataset.view));
+    });
+
+    renderMatrix();
+    renderTech();
+    renderDetails();
+    renderItems();
+    renderDecisions();
+    setView(new URLSearchParams(window.location.search).get("view") || "matrix");
+  </script>
+</body>
+</html>

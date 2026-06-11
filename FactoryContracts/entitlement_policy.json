@@ -1,0 +1,36 @@
+{
+  "schema": "tinyassets.game_factory.entitlements.v1",
+  "interfaces": {
+    "route_resolver": "IArchonSessionRouteResolver",
+    "entitlement_provider": "IArchonEntitlementProvider",
+    "effective_access": "FArchonEffectiveAccess",
+    "hero_entitlement": "FArchonHeroEntitlement"
+  },
+  "rights": [
+    "CoreCombat",
+    "Respawn",
+    "DefaultHeroAccess",
+    "AdditionalHeroAccess",
+    "MapTableInspect",
+    "MapTableSelect",
+    "MapTablePreview",
+    "MapTableExecute",
+    "CosmeticContent",
+    "ThemeContent"
+  ],
+  "route_policy": {
+    "OfflineSkirmish": "grant_all_gameplay",
+    "LANHosted": "grant_all_gameplay",
+    "PrivateHost": "grant_all_gameplay",
+    "SteamOnline": "grant_core_default_preview_only_without_entitlement"
+  },
+  "steam_online_paid_gameplay_rule": "Paid gameplay in SteamOnline is limited to additional horizontal hero variety and live RTS command execution only.",
+  "paid_hero_rule": "Paid heroes must be horizontal sidegrades and must never improve combat power over default heroes.",
+  "cosmetic_rule": "Cosmetics and theme packs may be paid only if clearly non-gameplay.",
+  "platform_seams": [
+    "SteamOwnership",
+    "SteamDLC",
+    "SteamMicrotransaction",
+    "BackendGrant"
+  ]
+}

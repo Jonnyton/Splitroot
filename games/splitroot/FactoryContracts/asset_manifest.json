@@ -1,0 +1,131 @@
+{
+  "schema": "tinyassets.game_factory.asset_manifest.v1",
+  "authored_at_utc": "2026-05-24T11:30:00Z",
+  "author": "Rook (Claude Opus 4.7, Cowork background session)",
+  "purpose": "Single source of truth for every asset the SPLITROOT v0 game needs. Each entry cites its source contract on the Workflow connector wiki, names its status against the gate ladder, and marks the remix surface so future factory-branch games inherit the discipline without inheriting the per-game art. This file does NOT claim assets exist — it claims they are NEEDED, CONTRACTED, or SHIPPED, with evidence.",
+  "ladder_position": {
+    "rung_1_local_playable_prototype": "EARNED 2026-05-23 (71 automation tests green, first-60-seconds smoke green)",
+    "rung_2_verified_vertical_slice": "in progress — combat C1-C6, art-direction polish, audio-direction polish, UMG HUD polish all contracted; implementation pending",
+    "rung_3_content_complete_alpha": "spec-drafted (hero plan, Valley v1 blockout)",
+    "rung_4_plus": "F2P validation gates not yet authored"
+  },
+  "status_values": {
+    "shipped":      "asset or C++ surface exists in the repo and is exercised by automation tests",
+    "implemented":  "C++ surface exists but the asset is a placeholder (e.g. debug-color material instead of textured material)",
+    "contracted":   "no implementation; full contract written on the connector wiki — Hex or Rook can implement",
+    "spec_drafted": "scope and intent on the connector wiki but no formal contract surface yet",
+    "unspecified":  "needed for rung-N but no spec exists"
+  },
+  "items": [
+    { "id": "faction.verdant_choir",           "category": "faction",         "status": "shipped",      "source_contract": "FactoryContracts/factions.json",                                                       "remix_surface": "PER_GAME",   "notes": "EArchonFaction::VerdantChoir enum + factions.json v2" },
+    { "id": "faction.lenswright_compact",      "category": "faction",         "status": "shipped",      "source_contract": "FactoryContracts/factions.json",                                                       "remix_surface": "PER_GAME",   "notes": "no_gunpowder = true; legal-distinct" },
+    { "id": "faction.kinwild_covenant",        "category": "faction",         "status": "shipped",      "source_contract": "FactoryContracts/factions.json",                                                       "remix_surface": "PER_GAME",   "notes": "movement verb shipped; combat & art rung-3" },
+
+    { "id": "palette.faction_colors",          "category": "material_data",   "status": "shipped",      "source_contract": "FactoryContracts/faction_palette.json",                                                "remix_surface": "PER_GAME",   "notes": "12 color values + lighting anchor — promotes Hex iteration-3 debug colors" },
+    { "id": "material.faction_builder",        "category": "material",        "status": "contracted",   "source_contract": "pages/plans/splitroot-polish-art-direction-2026-05-24.md (P1)",                       "remix_surface": "SUBSTRATE",  "notes": "UArchonFactionMaterialBuilder — Hex pickup" },
+    { "id": "material.faction_apply",          "category": "material",        "status": "contracted",   "source_contract": "pages/plans/splitroot-polish-art-direction-2026-05-24.md (P2)",                       "remix_surface": "PER_GAME",   "notes": "apply faction MIDs to every faction actor" },
+    { "id": "material.projectile_tint",        "category": "material",        "status": "contracted",   "source_contract": "pages/plans/splitroot-polish-art-direction-2026-05-24.md (P3)",                       "remix_surface": "PER_GAME",   "notes": "Verdant arrow green; Lenswright pressure-bolt cyan-accent (NOT muzzle-flash)" },
+
+    { "id": "lighting.valley_anchor",          "category": "lighting",        "status": "contracted",   "source_contract": "pages/plans/splitroot-polish-art-direction-2026-05-24.md (P4)",                       "remix_surface": "PER_GAME",   "notes": "ADirectionalLight + ASkyLight + AExponentialHeightFog values in faction_palette.json" },
+
+    { "id": "blockout.verdant_outpost",        "category": "blockout_actor",  "status": "implemented",  "source_contract": "pages/plans/splitroot-s5-blockout-spec-2026-05-23.md",                                  "remix_surface": "PER_GAME",   "notes": "AArchonVerdantOutpostActor — debug-color material; needs rung-B palette upgrade" },
+    { "id": "blockout.splitroot_tree_central", "category": "blockout_actor",  "status": "implemented",  "source_contract": "pages/plans/splitroot-s5-blockout-spec-2026-05-23.md",                                  "remix_surface": "PER_GAME",   "notes": "AArchonSplitrootTreeCentralActor — map landmark" },
+    { "id": "blockout.lenswright_outpost_ghost","category": "blockout_actor", "status": "implemented",  "source_contract": "pages/plans/splitroot-s5-blockout-spec-2026-05-23.md",                                  "remix_surface": "PER_GAME",   "notes": "AArchonLenswrightOutpostGhostActor — bIsGhost=true" },
+    { "id": "blockout.cover_stone_root_vault", "category": "blockout_actor",  "status": "implemented",  "source_contract": "pages/plans/splitroot-s5-blockout-spec-2026-05-23.md",                                  "remix_surface": "SUBSTRATE",  "notes": "AArchonCoverStoneRootVaultActor — 12 instances; faction-agnostic cover pattern" },
+    { "id": "blockout.valley_v1_full",         "category": "blockout_actor",  "status": "contracted",   "source_contract": "pages/plans/splitroot-valley-v1-full-map-blockout-spec-2026-05-24.md",                  "remix_surface": "PER_GAME",   "notes": "~30 BP placements: 3 bases (W/E/N), central splitroot cluster, 3 side resources, 3 lane corridors, underpass" },
+    { "id": "blockout.kinwild_encampment",     "category": "blockout_actor",  "status": "contracted",   "source_contract": "pages/plans/splitroot-valley-v1-full-map-blockout-spec-2026-05-24.md",                  "remix_surface": "PER_GAME",   "notes": "BP_KinwildEncampment + spawn chamber + production yard + core" },
+
+    { "id": "map.lvl_firstperson",             "category": "map",             "status": "shipped",      "source_contract": "Content/FirstPerson/Lvl_FirstPerson.umap (FPS template residue)",                       "remix_surface": "PER_GAME",   "notes": "current canary map; SplitrootValley_V0 actors spawn programmatically into it" },
+    { "id": "map.splitroot_valley_v0",         "category": "map",             "status": "spec_drafted", "source_contract": "pages/plans/splitroot-s5-blockout-spec-2026-05-23.md",                                  "remix_surface": "PER_GAME",   "notes": ".umap save deferred per S5 substitution note; programmatic-spawn covers smoke" },
+    { "id": "map.splitroot_valley_v1",         "category": "map",             "status": "contracted",   "source_contract": "pages/plans/splitroot-valley-v1-full-map-blockout-spec-2026-05-24.md",                  "remix_surface": "PER_GAME",   "notes": "FArchonValleyV1Layout struct recommended for first cut over binary umap" },
+
+    { "id": "unit.verdant_thornbound",         "category": "unit",            "status": "implemented",  "source_contract": "pages/plans/archon-fantasy-rts-fps-v0-unit-sheet-2026-05-20.md",                       "remix_surface": "PER_GAME",   "notes": "AArchonCanaryRtsSquadActor — RTS squad presence; FPS body deferred" },
+    { "id": "unit.verdant_sporecaster",        "category": "unit",            "status": "spec_drafted", "source_contract": "pages/plans/archon-fantasy-rts-fps-v0-unit-sheet-2026-05-20.md",                       "remix_surface": "PER_GAME",   "notes": "ranged spore-bolt; rung-2/3" },
+    { "id": "unit.verdant_grovekeeper",        "category": "unit",            "status": "spec_drafted", "source_contract": "pages/plans/archon-fantasy-rts-fps-v0-unit-sheet-2026-05-20.md",                       "remix_surface": "PER_GAME",   "notes": "support / cover / sustain" },
+    { "id": "unit.lenswright_gearguard",       "category": "unit",            "status": "spec_drafted", "source_contract": "pages/plans/archon-fantasy-rts-fps-v0-unit-sheet-2026-05-20.md",                       "remix_surface": "PER_GAME",   "notes": "frontline shield holder" },
+    { "id": "unit.lenswright_bracewright",     "category": "unit",            "status": "contracted",   "source_contract": "pages/plans/splitroot-c3-lenswright-units-ai-combat-contract-2026-05-24.md",            "remix_surface": "PER_GAME",   "notes": "C3 contract; AArchonLenswrightBracewrightActor pending" },
+    { "id": "unit.lenswright_sundial_optic",   "category": "unit",            "status": "contracted",   "source_contract": "pages/plans/splitroot-c3-lenswright-units-ai-combat-contract-2026-05-24.md",            "remix_surface": "PER_GAME",   "notes": "C3 contract; AArchonLenswrightSundialOpticActor pending" },
+    { "id": "unit.lenswright_lens_arbalist",   "category": "unit",            "status": "spec_drafted", "source_contract": "pages/plans/archon-fantasy-rts-fps-v0-unit-sheet-2026-05-20.md",                       "remix_surface": "PER_GAME",   "notes": "ranged lens-bolt" },
+    { "id": "unit.lenswright_fieldwright",     "category": "unit",            "status": "spec_drafted", "source_contract": "pages/plans/archon-fantasy-rts-fps-v0-unit-sheet-2026-05-20.md",                       "remix_surface": "PER_GAME",   "notes": "engineer / repair / deploy pressure node" },
+    { "id": "unit.kinwild_packbody",           "category": "unit",            "status": "unspecified",  "source_contract": "pages/plans/splitroot-kinwild-bound-leap-contract-2026-05-24.md",                       "remix_surface": "PER_GAME",   "notes": "Kinwild basic unit roster not yet authored; rung-3" },
+
+    { "id": "weapon.verdant_thornsprout_bow",  "category": "weapon",          "status": "shipped",      "source_contract": "pages/plans/splitroot-c2-verdant-thornsprout-bow-contract-2026-05-24.md",               "remix_surface": "PER_GAME",   "notes": "AArchonVerdantThornsproutBow + UArchonRangedWeaponComponent" },
+    { "id": "weapon.verdant_living_arrow",     "category": "weapon",          "status": "shipped",      "source_contract": "Source/ArchonFactoryCanary/Public/ArchonArrowProjectile.h",                            "remix_surface": "PER_GAME",   "notes": "AArchonArrowProjectile" },
+    { "id": "weapon.lenswright_pressure_bolt", "category": "weapon",          "status": "contracted",   "source_contract": "pages/plans/splitroot-c3-lenswright-units-ai-combat-contract-2026-05-24.md",            "remix_surface": "PER_GAME",   "notes": "pressure-bolt crossbow; NOT firearm — pressure-vent hiss + bolt-thwap audio" },
+
+    { "id": "movement.verdant_root_vault",     "category": "ability",         "status": "shipped",      "source_contract": "pages/plans/splitroot-s4-root-vault-contract-2026-05-23.md",                            "remix_surface": "PER_GAME",   "notes": "UArchonFactionMovementPolicyLibrary + Component; 850/450 impulse, 3s cooldown" },
+    { "id": "movement.kinwild_bound_leap",     "category": "ability",         "status": "contracted",   "source_contract": "pages/plans/splitroot-kinwild-bound-leap-contract-2026-05-24.md",                       "remix_surface": "PER_GAME",   "notes": "second-faction verb proving factory remixability" },
+    { "id": "movement.lenswright_pressure_thrust","category": "ability",      "status": "spec_drafted", "source_contract": "pages/notes/pages-notes-splitroot-design-extensions-beyond-v0-spec-2026-05-23.md",     "remix_surface": "PER_GAME",   "notes": "sprint+crouch+jump → vertical pressure cylinder; contract pending" },
+    { "id": "power.verdant_root_wall",         "category": "ability",         "status": "spec_drafted", "source_contract": "pages/plans/archon-fantasy-rts-fps-v0-unit-sheet-2026-05-20.md",                       "remix_surface": "PER_GAME",   "notes": "RTS-placed temporary cover" },
+    { "id": "power.lenswright_pressure_gate",  "category": "ability",         "status": "spec_drafted", "source_contract": "pages/plans/archon-fantasy-rts-fps-v0-unit-sheet-2026-05-20.md",                       "remix_surface": "PER_GAME",   "notes": "RTS-placed mobility/disrupt pad" },
+
+    { "id": "hero.briar_saint",                "category": "hero",            "status": "contracted",   "source_contract": "pages/plans/splitroot-hero-plan-briar-saint-master-artificer-2026-05-24.md",            "remix_surface": "LOCKED_STATS_REMIXABLE_PRESENTATION", "notes": "Verdant; 350HP, 1.15x speed, 1.3x weapon, BriarWall+ChoirCircle" },
+    { "id": "hero.master_artificer",           "category": "hero",            "status": "contracted",   "source_contract": "pages/plans/splitroot-hero-plan-briar-saint-master-artificer-2026-05-24.md",            "remix_surface": "LOCKED_STATS_REMIXABLE_PRESENTATION", "notes": "Lenswright; PressureGate+OpticBarrage (high-pressure crossbow artillery, NOT gunpowder)" },
+    { "id": "hero.component_surface",          "category": "hero",            "status": "contracted",   "source_contract": "pages/plans/splitroot-hero-plan-briar-saint-master-artificer-2026-05-24.md",            "remix_surface": "SUBSTRATE",  "notes": "UArchonHeroComponent + FArchonHeroLockedStats + FArchonHeroPresentation — server validates LockedStats" },
+    { "id": "ability.briar_wall",              "category": "ability",         "status": "contracted",   "source_contract": "pages/plans/splitroot-hero-plan-briar-saint-master-artificer-2026-05-24.md",            "remix_surface": "PER_GAME",   "notes": "6m wall, 200HP, 12s, vault-able by Verdant root-vault" },
+    { "id": "ability.choir_circle",            "category": "ability",         "status": "contracted",   "source_contract": "pages/plans/splitroot-hero-plan-briar-saint-master-artificer-2026-05-24.md",            "remix_surface": "PER_GAME",   "notes": "12m radius; allies heal 5HP/s, enemies 4dmg/s, 8s; 60s cd" },
+    { "id": "ability.pressure_gate_deploy",    "category": "ability",         "status": "contracted",   "source_contract": "pages/plans/splitroot-hero-plan-briar-saint-master-artificer-2026-05-24.md",            "remix_surface": "PER_GAME",   "notes": "4m square pad; doubles pressure-thrust boost; until destroyed" },
+    { "id": "ability.optic_barrage",           "category": "ability",         "status": "contracted",   "source_contract": "pages/plans/splitroot-hero-plan-briar-saint-master-artificer-2026-05-24.md",            "remix_surface": "PER_GAME",   "notes": "10m circle; 5 pressure-bolts over 4s; 35dmg each; NOT gunpowder" },
+
+    { "id": "combat.health_component",         "category": "combat",          "status": "contracted",   "source_contract": "pages/plans/splitroot-c1-combat-fundamentals-contract-2026-05-24.md",                    "remix_surface": "SUBSTRATE",  "notes": "UArchonCombatHealthComponent + UArchonCombatPolicyLibrary (some shipped; check Source)" },
+    { "id": "combat.death_respawn_loop",       "category": "combat",          "status": "contracted",   "source_contract": "pages/plans/splitroot-c4-death-respawn-loop-contract-2026-05-24.md",                    "remix_surface": "SUBSTRATE",  "notes": "UArchonRespawnStateComponent + body picker + spawn point selection" },
+    { "id": "combat.command_while_you_wait",   "category": "combat",          "status": "contracted",   "source_contract": "pages/plans/splitroot-c5-command-while-you-wait-contract-2026-05-24.md",               "remix_surface": "SUBSTRATE",  "notes": "remove dead-state gate on map table; Tab from respawn opens table" },
+    { "id": "combat.second_60_seconds_smoke",  "category": "proof",           "status": "contracted",   "source_contract": "pages/plans/splitroot-c6-second-60-seconds-smoke-contract-2026-05-24.md",                "remix_surface": "SUBSTRATE",  "notes": "Proof/second-60-seconds-smoke.ps1; rung-2 anchor" },
+
+    { "id": "audio.faction_audio_library",     "category": "audio",           "status": "shipped",      "source_contract": "FactoryContracts/faction_audio_palette.json",                                          "remix_surface": "SUBSTRATE",  "notes": "data ships; UArchonFactionAudioLibrary C++ surface contracted in audio-direction polish A1" },
+    { "id": "audio.strategic_event_broadcaster","category": "audio",          "status": "contracted",   "source_contract": "pages/plans/splitroot-polish-audio-direction-2026-05-24.md (A3)",                       "remix_surface": "SUBSTRATE",  "notes": "UArchonStrategicAudioBroadcasterComponent; 14 events in strategic_audio_events.json" },
+    { "id": "audio.ambient_zone_actor",        "category": "audio",           "status": "contracted",   "source_contract": "pages/plans/splitroot-polish-audio-direction-2026-05-24.md (A4)",                       "remix_surface": "SUBSTRATE",  "notes": "AArchonAmbientAudioZone — sphere trigger + looping audio component" },
+    { "id": "audio.verdant_cue_assets",        "category": "audio_assets",    "status": "unspecified",  "source_contract": "pages/plans/splitroot-polish-audio-direction-2026-05-24.md",                            "remix_surface": "PER_GAME",   "notes": "Freesound CC0/CC-BY sourcing + EQ pass; import to Content/Audio/Verdant/" },
+    { "id": "audio.lenswright_cue_assets",     "category": "audio_assets",    "status": "unspecified",  "source_contract": "pages/plans/splitroot-polish-audio-direction-2026-05-24.md",                            "remix_surface": "PER_GAME",   "notes": "no-gunpowder audit per faction_audio_palette.json forbidden_terms" },
+    { "id": "audio.kinwild_cue_assets",        "category": "audio_assets",    "status": "unspecified",  "source_contract": "pages/plans/splitroot-polish-audio-direction-2026-05-24.md",                            "remix_surface": "PER_GAME",   "notes": "rung-3+" },
+    { "id": "audio.strategic_cue_assets",      "category": "audio_assets",    "status": "unspecified",  "source_contract": "FactoryContracts/strategic_audio_events.json",                                          "remix_surface": "PER_GAME",   "notes": "14 cue files; ~3 minutes total audio content" },
+    { "id": "audio.neutral_world_assets",      "category": "audio_assets",    "status": "unspecified",  "source_contract": "FactoryContracts/faction_audio_palette.json",                                          "remix_surface": "PER_GAME",   "notes": "splitroot tree, valley wind, cover stone echo, hit confirm" },
+
+    { "id": "hud.root_widget",                 "category": "ui",              "status": "contracted",   "source_contract": "pages/plans/splitroot-polish-umg-hud-2026-05-24.md (H7)",                               "remix_surface": "SUBSTRATE",  "notes": "UArchonHudRootWidget — composite; conditional by life state" },
+    { "id": "hud.faction_tinted_base",         "category": "ui",              "status": "contracted",   "source_contract": "pages/plans/splitroot-polish-umg-hud-2026-05-24.md (H1)",                               "remix_surface": "SUBSTRATE",  "notes": "UArchonFactionTintedWidget — shared base; reads faction_palette.json" },
+    { "id": "hud.health_bar",                  "category": "ui",              "status": "contracted",   "source_contract": "pages/plans/splitroot-polish-umg-hud-2026-05-24.md (H2)",                               "remix_surface": "PER_GAME",   "notes": "bottom-left, faction primary fill" },
+    { "id": "hud.ammo",                        "category": "ui",              "status": "contracted",   "source_contract": "pages/plans/splitroot-polish-umg-hud-2026-05-24.md (H2)",                               "remix_surface": "PER_GAME",   "notes": "bottom-right, reload state surface" },
+    { "id": "hud.reticle",                     "category": "ui",              "status": "contracted",   "source_contract": "pages/plans/splitroot-polish-umg-hud-2026-05-24.md (H2)",                               "remix_surface": "PER_GAME",   "notes": "center; hit-confirm flash" },
+    { "id": "hud.squad_state",                 "category": "ui",              "status": "contracted",   "source_contract": "pages/plans/splitroot-polish-umg-hud-2026-05-24.md (H3)",                               "remix_surface": "SUBSTRATE",  "notes": "Archon transparency — last command + issuing player handle per squad" },
+    { "id": "hud.respawn_screen",              "category": "ui",              "status": "contracted",   "source_contract": "pages/plans/splitroot-polish-umg-hud-2026-05-24.md (H4)",                               "remix_surface": "SUBSTRATE",  "notes": "body picker + timer + glowing Tab-open-table button (the design heartbeat)" },
+    { "id": "hud.kill_feed",                   "category": "ui",              "status": "contracted",   "source_contract": "pages/plans/splitroot-polish-umg-hud-2026-05-24.md (H5)",                               "remix_surface": "PER_GAME",   "notes": "faction-tinted entries; Lenswright icon = cyan pressure-bolt mesh (NOT firearm)" },
+    { "id": "hud.strategic_banner",            "category": "ui",              "status": "contracted",   "source_contract": "pages/plans/splitroot-polish-umg-hud-2026-05-24.md (H6)",                               "remix_surface": "SUBSTRATE",  "notes": "paired with strategic_audio_events.json" },
+    { "id": "hud.map_table_widget",            "category": "ui",              "status": "shipped",      "source_contract": "Source/ArchonFactoryCanary/Public/ArchonMapTableWidget.h",                            "remix_surface": "SUBSTRATE",  "notes": "C++ surface shipped + 3 widget tests; no WBP_ deriving Blueprint yet (smoke uses C++ path)" },
+
+    { "id": "data.entitlement_policy",         "category": "monetization",    "status": "shipped",      "source_contract": "FactoryContracts/entitlement_policy.json",                                              "remix_surface": "SUBSTRATE",  "notes": "10 rights, 4 route policies; horizontal-only paid heroes locked in writing" },
+    { "id": "data.session_routes",             "category": "monetization",    "status": "shipped",      "source_contract": "FactoryContracts/session_routes.json",                                                  "remix_surface": "SUBSTRATE",  "notes": "Offline/LAN/Private free; SteamOnline preview-no-op without entitlement" },
+    { "id": "data.archon_adapter_contract",    "category": "contract",        "status": "shipped",      "source_contract": "FactoryContracts/archon_adapter_contract.md",                                           "remix_surface": "SUBSTRATE",  "notes": "reusable modules + required future proof" }
+  ],
+  "category_summary": {
+    "faction":         3,
+    "material_data":   1,
+    "material":        3,
+    "lighting":        1,
+    "blockout_actor":  6,
+    "map":             3,
+    "unit":            9,
+    "weapon":          3,
+    "ability":         8,
+    "hero":            3,
+    "combat":          4,
+    "audio":           3,
+    "audio_assets":    5,
+    "ui":              10,
+    "monetization":    2,
+    "contract":        1,
+    "proof":           1
+  },
+  "remix_surface_legend": {
+    "SUBSTRATE":                            "core factory pattern — every game on this branch inherits, do not change per-game",
+    "PER_GAME":                             "swap entirely for each new game on the factory branch",
+    "LOCKED_STATS_REMIXABLE_PRESENTATION":  "horizontal-only paid discipline — stats locked SUBSTRATE-wide, presentation PER_GAME and PER_PACK"
+  },
+  "what_this_manifest_does_not_claim": [
+    "production-quality 3D meshes exist (none do at rung-2)",
+    "production audio files exist (audio_assets entries are all unspecified — Freesound sourcing pending)",
+    "binary WBP_ Blueprint widgets exist (UMG widget C++ surfaces are contracted; Blueprint visual layout deferred)",
+    "Steam integration is implemented (substrate only)",
+    "manual playtest has validated feel (rung-2 anchor)",
+    "any AAA / sell-ready / packaged-build state"
+  ]
+}

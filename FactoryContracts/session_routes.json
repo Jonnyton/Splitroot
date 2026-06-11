@@ -1,0 +1,45 @@
+{
+  "schema": "tinyassets.game_factory.session_routes.v1",
+  "routes": [
+    {
+      "name": "OfflineSkirmish",
+      "classification": "Local custom skirmish against AI on the player's own computer.",
+      "full_game_free": true,
+      "heroes": "all",
+      "live_rts_execution": true
+    },
+    {
+      "name": "LANHosted",
+      "classification": "Local network hosted multiplayer.",
+      "full_game_free": true,
+      "heroes": "all",
+      "live_rts_execution": true
+    },
+    {
+      "name": "PrivateHost",
+      "classification": "Private host route defined separately from SteamOnline public or platform-routed internet play.",
+      "full_game_free": true,
+      "heroes": "all",
+      "live_rts_execution": true
+    },
+    {
+      "name": "SteamOnline",
+      "classification": "Internet multiplayer through Steam lobbies, matchmaking, relay, or another non-local online route.",
+      "full_game_free": false,
+      "core_combat_free": true,
+      "respawn_free": true,
+      "default_heroes_free": true,
+      "map_table_preview_free": true,
+      "free_rts_execution_behavior": "preview_no_op",
+      "paid_gameplay_scope": [
+        "additional_horizontal_hero_variety",
+        "live_rts_command_execution"
+      ]
+    }
+  ],
+  "classification_rules": {
+    "non_invasive": true,
+    "no_household_detection": true,
+    "fallback_for_ambiguous_online_route": "SteamOnline"
+  }
+}

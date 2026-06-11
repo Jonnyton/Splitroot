@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "workflow-live": {
+      "type": "http",
+      "url": "https://tinyassets.io/mcp"
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "schema": "tinyassets.game_factory.strategic_audio_events.v1",
+  "authored_at_utc": "2026-05-24T11:30:00Z",
+  "author": "Rook (Claude Opus 4.7, Cowork background session)",
+  "source_contracts": [
+    "pages/plans/splitroot-polish-audio-direction-2026-05-24.md"
+  ],
+  "purpose": "Strategic-layer cue inventory. All position-agnostic 2D cues that fire on match state changes. Every player on every team hears every cue every match. Forms the match-state audio language. Consumed by UArchonFactionAudioLibrary::GetStrategicEventCue() and UArchonStrategicAudioBroadcasterComponent.",
+  "mix_priority": "highest — clearly audible over all combat",
+  "layer": "Strategic",
+  "events": [
+    { "id": "MatchStart",                  "cue_description": "three rising tones (E-A-D) + low whoosh",                                    "duration_seconds": 3.0,  "tone": "neutral" },
+    { "id": "SideResourceCapturedAlly",    "cue_description": "bright two-note rise (G-C)",                                                 "duration_seconds": 1.5,  "tone": "positive" },
+    { "id": "SideResourceCapturedEnemy",   "cue_description": "dim two-note fall (G-D)",                                                    "duration_seconds": 1.5,  "tone": "negative" },
+    { "id": "CentralResourceFlipped",      "cue_description": "heavier four-note phrase (E-G-A-C upward) + low rumble",                     "duration_seconds": 2.5,  "tone": "alert" },
+    { "id": "HeroUnlockedAlly",            "cue_description": "long shimmering pad sustain + bell",                                          "duration_seconds": 4.0,  "tone": "positive" },
+    { "id": "HeroUnlockedEnemy",           "cue_description": "same shimmer pitched lower + slight discord",                                 "duration_seconds": 4.0,  "tone": "alert" },
+    { "id": "HeroArrivedAlly",             "cue_description": "faction-specific motif (Verdant choir-soar / Lenswright gear-ascend / Kinwild horn-call)", "duration_seconds": 2.5, "tone": "positive", "per_faction": true },
+    { "id": "HeroDeathAlly",               "cue_description": "dampened motif fall (somber, brief)",                                         "duration_seconds": 2.0,  "tone": "negative" },
+    { "id": "HeroDeathEnemy",              "cue_description": "brief tonal ping (neutral acknowledgement)",                                  "duration_seconds": 1.0,  "tone": "neutral" },
+    { "id": "BaseCoreUnderAttack",         "cue_description": "insistent pulsing low tone + clock-tick (urgency)",                           "duration_seconds": 4.0,  "tone": "urgent", "looping": true, "stops_on": "attack ends OR core destroyed" },
+    { "id": "BaseCoreDestroyed",           "cue_description": "massive bass thud + room-rumble sustain",                                     "duration_seconds": 6.0,  "tone": "match_end" },
+    { "id": "FactionPowerActivatedAlly",   "cue_description": "faction-specific signature (Verdant choir-chord / Lenswright pressure-burst / Kinwild howl)", "duration_seconds": 2.0, "tone": "positive", "per_faction": true },
+    { "id": "MatchVictory",                "cue_description": "triumphant motif over 6s",                                                    "duration_seconds": 6.0,  "tone": "positive" },
+    { "id": "MatchDefeat",                 "cue_description": "somber motif over 6s",                                                        "duration_seconds": 6.0,  "tone": "negative" }
+  ],
+  "ui_pairing": "Each event also fires a UArchonStrategicEventBannerWidget banner per UMG HUD polish plan H6. Audio and visual share the same broadcaster.",
+  "remix_rule": "Future games swap the cue descriptions and the per_faction motifs. The 14-event enum and the match-state audio language pattern are SUBSTRATE."
+}

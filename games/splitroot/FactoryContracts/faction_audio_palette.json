@@ -1,0 +1,79 @@
+{
+  "schema": "tinyassets.game_factory.faction_audio_palette.v1",
+  "authored_at_utc": "2026-05-24T11:30:00Z",
+  "author": "Rook (Claude Opus 4.7, Cowork background session)",
+  "source_contracts": [
+    "pages/plans/splitroot-polish-audio-direction-2026-05-24.md",
+    "pages/notes/pages-notes-splitroot-design-extensions-beyond-v0-spec-2026-05-23.md (§FPS feel doctrine #7)",
+    "FactoryContracts/factions.json"
+  ],
+  "purpose": "Per-faction cue family inventory. Consumed by UArchonFactionAudioLibrary (audio-direction polish A1). The Lenswright forbidden_terms list is the audit predicate for ValidateLenswrightCuesAreNotGunpowder() — protects the no-gunpowder hill at the audio layer.",
+  "four_layers": ["Local", "Squad", "Strategic", "Table"],
+  "layer_definitions": {
+    "Local":     { "range_meters": 10, "spatial": "3D", "mix_priority": "low" },
+    "Squad":     { "range_meters": 40, "spatial": "3D", "mix_priority": "medium" },
+    "Strategic": { "range_meters": null, "spatial": "2D", "mix_priority": "highest", "note": "position-agnostic; same volume for all listeners" },
+    "Table":     { "range_meters": null, "spatial": "2D", "mix_priority": "ui_layer", "note": "active only while map table widget is open; ducks local/squad" }
+  },
+  "factions": {
+    "VerdantChoir": {
+      "id": "verdant_choir",
+      "palette_summary": "choral organic — wood/leaf/string + choir-pad",
+      "families": {
+        "footstep":         { "layer": "Local",  "description": "soft leaf-crunch, occasional twig-snap" },
+        "weapon_fire":      { "layer": "Squad",  "description": "bowstring snap (taut, low-thump)" },
+        "weapon_travel":    { "layer": "Squad",  "description": "arrow leaf-rustle in flight" },
+        "weapon_impact":    { "layer": "Squad",  "description": "soft thud on body OR leaf-crunch on miss" },
+        "hit_received":     { "layer": "Local",  "description": "distant chord-tone + dampened drum" },
+        "ability_briar_wall": { "layer": "Squad","description": "bramble-grow earth-rumble + wooden creak" },
+        "ambient_zone":     { "layer": "Local",  "description": "distant choir-hum + leaf-wind", "looping": true },
+        "hero_ambient":     { "layer": "Local",  "description": "choir-hum present while alive (5db under ambient)", "looping": true, "hero_only": "BriarSaint" },
+        "death":            { "layer": "Squad",  "description": "choral pad swell + leaf-flutter cascade" }
+      }
+    },
+    "LenswrightCompact": {
+      "id": "lenswright_compact",
+      "palette_summary": "clockwork mechanical — gear-tick + pressure-vent + metal-clank (NO gunpowder)",
+      "no_gunpowder_audit": {
+        "forbidden_terms": [
+          "gunshot", "gunfire", "firearm", "muzzle", "muzzle_flash",
+          "rifle", "pistol", "handgun", "musket", "blunderbuss",
+          "powder", "gunpowder", "crack", "bang", "pop",
+          "flintlock", "matchlock", "wheellock", "snaplock"
+        ],
+        "audit_predicate": "ValidateLenswrightCuesAreNotGunpowder()",
+        "rejection_policy": "Any imported asset whose name, tag, or filename contains a forbidden term is rejected at audio library lookup time AND in PR review."
+      },
+      "families": {
+        "footstep":         { "layer": "Local",  "description": "metallic foot-plate clank + gear-tick during stride; occasional pressure-vent hiss" },
+        "weapon_fire":      { "layer": "Squad",  "description": "pressure-vent hiss (300ms compressed-gas release)", "explicit_not": "bang/crack/pop/gunshot" },
+        "weapon_travel":    { "layer": "Squad",  "description": "bolt-tracer hum (short, low)" },
+        "weapon_impact":    { "layer": "Squad",  "description": "bolt-thwap on body OR metallic ring on miss" },
+        "hit_received":     { "layer": "Local",  "description": "metal-plate clang + clockwork-skip stutter" },
+        "ability_pressure_gate": { "layer": "Squad", "description": "hydraulic clunk + gear-lock click" },
+        "ambient_zone":     { "layer": "Local",  "description": "clockwork-tick + pipe-hiss + gear-grind", "looping": true },
+        "hero_ambient":     { "layer": "Local",  "description": "clockwork-tick present while alive (5db under ambient)", "looping": true, "hero_only": "MasterArtificer" },
+        "death":            { "layer": "Squad",  "description": "mechanism wind-down + final pressure-vent fade" }
+      }
+    },
+    "KinwildCovenant": {
+      "id": "kinwild_covenant",
+      "palette_summary": "primal pack — paw-pad + hunt-horn + drum-pulse",
+      "rung_status": "spec-drafted (rung-3+ for full implementation; geometry can ship at rung-2 if Kinwild squad spawns)",
+      "families": {
+        "footstep":         { "layer": "Local",  "description": "soft paw-pad steps" },
+        "weapon_fire":      { "layer": "Squad",  "description": "bowstring twang (lower-tension than Verdant) OR beast-bite snarl (melee)" },
+        "ambient_zone":     { "layer": "Local",  "description": "distant pack-call + wind-through-grass + drum-pulse", "looping": true },
+        "hero_ambient":     { "layer": "Local",  "description": "distant hunt-horn always present", "looping": true, "hero_only": "PackCaller_TBD" }
+      }
+    }
+  },
+  "neutral_world": {
+    "splitroot_tree_ambient": { "layer": "Local",  "description": "deep wood-creak + low-frequency hum (the tree is alive)", "looping": true },
+    "valley_wind":            { "layer": "Local",  "description": "soft valley-wind layer at all positions", "looping": true },
+    "cover_stone_echo":       { "layer": "Local",  "description": "footstep echo in stone-rich areas" },
+    "hit_confirm":            { "layer": "Local",  "description": "shared cross-faction clear 'thunk' at listener position when you score a hit", "spatial": "2D", "faction_agnostic": true }
+  },
+  "combat_three_layer_rule": "Every weapon-hit ships THREE cues per faction: (1) weapon_fire (your weapon body), (2) weapon_travel (projectile in flight), (3) weapon_impact (hit on target). Missing any of the three breaks the 'I shot something' read.",
+  "remix_rule": "Future games swap the per-faction family descriptions + sound files + ambient zones. The four-layer discipline, the three-layer combat rule, and the per-faction forbidden_terms audit pattern are SUBSTRATE."
+}

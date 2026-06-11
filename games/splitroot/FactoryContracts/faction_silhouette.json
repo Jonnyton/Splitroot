@@ -1,0 +1,69 @@
+{
+  "schema": "tinyassets.game_factory.faction_silhouette.v1",
+  "authored_at_utc": "2026-05-24T12:30:00Z",
+  "author": "Rook (Claude Opus 4.7, Cowork background session)",
+  "source_contracts": [
+    "pages/plans/splitroot-polish-art-direction-2026-05-24.md (§Silhouette discipline)",
+    "FactoryContracts/factions.json"
+  ],
+  "purpose": "Per-faction silhouette discipline values. Consumed by UArchonFactionSilhouetteLibrary so future procedural mesh generators, UMG body-picker widgets, and capsule-based debug actors all read one source of truth. The discipline rule is: a player at 30m must identify faction by silhouette alone, before color, before label.",
+  "capsule_baseline": {
+    "height_units": 192.0,
+    "radius_units": 42.0,
+    "note": "Engine default Unreal capsule. All faction multipliers scale from this."
+  },
+  "mantle_types": ["None", "RoundedTopCap", "RightShoulderProtrusion", "LeftShoulderProtrusion", "MantleCloak", "AnimalCompanion"],
+  "factions": {
+    "VerdantChoir": {
+      "id": "verdant_choir",
+      "capsule_height_multiplier": 1.05,
+      "capsule_radius_multiplier": 1.0,
+      "mantle_type": "RoundedTopCap",
+      "shoulder_protrusion_units": 35.0,
+      "shoulder_side": "Right",
+      "forward_lean_degrees": 0.0,
+      "has_animal_companion": false,
+      "silhouette_summary": "Vertical bias + asymmetric upper-body cap (quiver/bramble) + rounded organic top. Reads as 'grown-tall, asymmetric, organic' at 30m."
+    },
+    "LenswrightCompact": {
+      "id": "lenswright_compact",
+      "capsule_height_multiplier": 1.0,
+      "capsule_radius_multiplier": 1.0,
+      "lower_capsule_radius_multiplier": 1.2,
+      "mantle_type": "RightShoulderProtrusion",
+      "shoulder_protrusion_units": 50.0,
+      "shoulder_side": "Right",
+      "shoulder_protrusion_purpose": "crossbow mount silhouette — Lenswright unit ID at 30m IS the crossbow profile",
+      "head_lens_sphere_radius_units": 12.0,
+      "forward_lean_degrees": 0.0,
+      "has_animal_companion": false,
+      "silhouette_summary": "Wide hunched base (1.2x lower-radius), right-shoulder crossbow protrusion, reflective head-lens sphere. Reads as 'anchored, mechanical, watching' at 30m."
+    },
+    "KinwildCovenant": {
+      "id": "kinwild_covenant",
+      "capsule_height_multiplier": 1.0,
+      "capsule_radius_multiplier": 1.0,
+      "mantle_type": "MantleCloak",
+      "shoulder_protrusion_units": 0.0,
+      "forward_lean_degrees": 10.0,
+      "has_animal_companion": true,
+      "companion_capsule_height_units": 80.0,
+      "companion_capsule_radius_units": 28.0,
+      "companion_offset_right_units": 80.0,
+      "silhouette_summary": "Forward-leaning 10° + cloak mantle + beast companion at the unit's right hip. Reads as 'in motion, hunt-bound, paired' at 30m."
+    }
+  },
+  "hero_overlay": {
+    "scale_multiplier": 1.15,
+    "ground_ring_decal": true,
+    "ring_color_source": "FactionPaletteSlot::Accent",
+    "purpose": "Heroes are always recognizable at any distance — 1.15x silhouette + faction-accent ground ring decal beneath them."
+  },
+  "buildings": {
+    "VerdantOutpost":         { "footprint_units": [800, 800, 4000], "shape_summary": "tall central spire + 4 low encircling walls" },
+    "LenswrightOutpost":      { "footprint_units": [2000, 1500, 1500], "shape_summary": "wide low building + 2 corner turret cylinders" },
+    "KinwildEncampment":      { "footprint_units": [1500, 1500, 800],  "shape_summary": "low tent cluster (3 angled cones) + central fire-pit cylinder" },
+    "CentralSplitrootTree":   { "footprint_units": [1500, 1500, 6000], "shape_summary": "tall central trunk + 3 above-ground root knee-walls splitting toward each faction homeland; map centerpiece visible from every base outer choke" }
+  },
+  "remix_rule": "Future games swap the per-faction multipliers + mantle types + companion shapes. The 6-mantle-type enum, the capsule-baseline + multiplier pattern, the hero-overlay (scale + ring decal) substrate, and the building-as-faction-shape discipline are SUBSTRATE."
+}

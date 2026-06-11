@@ -1,0 +1,1013 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SPLITROOT RTS Command Preview</title>
+  <style>
+    :root {
+      --verdant-primary: #4d8c40;
+      --verdant-secondary: #f5e8c8;
+      --verdant-tertiary: #1c3a1f;
+      --verdant-accent: #a8d060;
+      --lens-primary: #8c4d26;
+      --lens-accent: #5ec8e0;
+      --kinwild-primary: #a6803e;
+      --stone: #595959;
+      --earth: #6f6551;
+      --wood: #735026;
+      --sky: #94a3a8;
+      --hud: rgba(10, 17, 13, 0.88);
+      --hud-deep: rgba(4, 8, 6, 0.92);
+      --panel: rgba(17, 32, 23, 0.78);
+      --panel-soft: rgba(22, 43, 29, 0.56);
+      --glass-map: rgba(24, 64, 42, 0.24);
+      --line: rgba(190, 222, 146, 0.34);
+      --text: #f3f0d5;
+      --muted: #aeb99c;
+      --warn: #e6c46b;
+      --danger: #e07b5f;
+      --cyan: #5ec8e0;
+      color-scheme: dark;
+      font-family: "Segoe UI", "Arial", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #050806;
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .viewport {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      min-width: 1120px;
+      min-height: 700px;
+      background:
+        linear-gradient(180deg, rgba(148, 163, 168, 0.36) 0%, rgba(80, 89, 78, 0.18) 24%, rgba(20, 29, 18, 0.12) 45%),
+        linear-gradient(120deg, rgba(77, 140, 64, 0.22), rgba(115, 80, 38, 0.26) 48%, rgba(28, 58, 31, 0.28)),
+        #102014;
+      isolation: isolate;
+    }
+
+    .world {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      opacity: 0.94;
+    }
+
+    .terrain-band {
+      position: absolute;
+      inset: 10% -5% auto -5%;
+      height: 56%;
+      transform: rotate(-4deg);
+      background:
+        repeating-linear-gradient(88deg, rgba(111, 101, 81, 0.34) 0 22px, rgba(28, 58, 31, 0.22) 22px 48px),
+        linear-gradient(90deg, rgba(77, 140, 64, 0.18), rgba(89, 89, 89, 0.18), rgba(140, 77, 38, 0.16));
+      filter: saturate(0.9);
+    }
+
+    .map-table {
+      position: absolute;
+      left: 34%;
+      top: 27%;
+      width: 32%;
+      height: 28%;
+      border: 2px solid rgba(245, 232, 200, 0.20);
+      background:
+        linear-gradient(90deg, rgba(168, 208, 96, 0.12) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(168, 208, 96, 0.12) 1px, transparent 1px),
+        rgba(12, 26, 17, 0.34);
+      background-size: 9% 12%;
+      transform: perspective(680px) rotateX(58deg) rotateZ(-4deg);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.38);
+    }
+
+    .world-event {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border: 2px solid var(--warn);
+      background: rgba(230, 196, 107, 0.28);
+      transform: translate(-50%, -50%) rotate(45deg);
+    }
+
+    .world-event.skirmish {
+      border-color: var(--danger);
+      background: rgba(224, 123, 95, 0.34);
+    }
+
+    .world-event.move {
+      border-color: var(--verdant-accent);
+      background: rgba(168, 208, 96, 0.26);
+    }
+
+    .event-label {
+      position: absolute;
+      top: 14px;
+      left: 10px;
+      min-width: 88px;
+      color: rgba(245, 232, 200, 0.72);
+      font-size: 11px;
+      letter-spacing: 0;
+      transform: rotate(-45deg);
+      text-transform: uppercase;
+    }
+
+    .topbar {
+      position: absolute;
+      top: 22px;
+      left: 28px;
+      right: 28px;
+      height: 60px;
+      display: grid;
+      grid-template-columns: 1.15fr 0.72fr 1.05fr 1.15fr;
+      gap: 14px;
+      padding: 9px 16px;
+      align-items: center;
+      background: var(--hud);
+      border: 1px solid var(--line);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .crest {
+      width: 34px;
+      height: 34px;
+      border: 2px solid rgba(168, 208, 96, 0.85);
+      background:
+        linear-gradient(45deg, transparent 42%, rgba(245, 232, 200, 0.82) 43% 55%, transparent 56%),
+        var(--verdant-tertiary);
+      transform: rotate(45deg);
+      flex: 0 0 auto;
+    }
+
+    .title {
+      font-size: 22px;
+      font-weight: 800;
+      white-space: nowrap;
+      letter-spacing: 0;
+    }
+
+    .subline {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .stat-block {
+      min-width: 0;
+      color: var(--text);
+      text-align: right;
+      font-weight: 700;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .stat-block span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 12px;
+    }
+
+    .tactical-map {
+      position: absolute;
+      top: 92px;
+      left: 44px;
+      right: 44px;
+      bottom: 312px;
+      padding: 18px;
+      background: var(--glass-map);
+      border: 1px solid rgba(168, 208, 96, 0.22);
+      overflow: hidden;
+    }
+
+    .tactical-map::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(245, 232, 200, 0.08) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(245, 232, 200, 0.08) 1px, transparent 1px);
+      background-size: 88px 64px;
+      pointer-events: none;
+    }
+
+    .tactical-header {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      z-index: 1;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: 0;
+      color: var(--verdant-secondary);
+      text-transform: uppercase;
+    }
+
+    .control-strip {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+      margin-top: 9px;
+      width: 188px;
+    }
+
+    .group-pill {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      min-width: 0;
+      height: 26px;
+      padding: 0 7px;
+      border: 1px solid rgba(245, 232, 200, 0.12);
+      background: rgba(22, 34, 26, 0.70);
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .group-pill.active {
+      border-color: rgba(168, 208, 96, 0.72);
+      background: rgba(77, 140, 64, 0.52);
+      color: var(--verdant-secondary);
+    }
+
+    .group-key {
+      color: var(--verdant-accent);
+    }
+
+    .readout {
+      margin-top: 7px;
+      color: rgba(214, 229, 182, 0.88);
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .map-lane {
+      position: absolute;
+      left: 9%;
+      right: 9%;
+      top: 44%;
+      height: 3px;
+      background: rgba(168, 208, 96, 0.42);
+      transform: rotate(-6deg);
+    }
+
+    .map-route {
+      position: absolute;
+      left: 27%;
+      top: 55%;
+      width: 36%;
+      height: 2px;
+      background: var(--verdant-accent);
+      transform: rotate(-14deg);
+      box-shadow: 0 0 10px rgba(168, 208, 96, 0.48);
+    }
+
+    .squad-marker,
+    .enemy-marker,
+    .site-marker,
+    .rally-marker {
+      position: absolute;
+      z-index: 1;
+      transform: translate(-50%, -50%);
+    }
+
+    .squad-marker {
+      left: 43%;
+      top: 56%;
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--verdant-accent);
+      background: rgba(77, 140, 64, 0.46);
+    }
+
+    .enemy-marker {
+      left: 73%;
+      top: 62%;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--danger);
+      background: rgba(140, 77, 38, 0.52);
+      border-radius: 50%;
+    }
+
+    .site-marker {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(245, 232, 200, 0.78);
+      background: rgba(89, 89, 89, 0.48);
+      transform: translate(-50%, -50%) rotate(45deg);
+    }
+
+    .site-a { left: 35%; top: 43%; }
+    .site-b { left: 56%; top: 50%; }
+    .site-c { left: 66%; top: 34%; }
+
+    .rally-marker {
+      left: 61%;
+      top: 48%;
+      width: 12px;
+      height: 32px;
+      border-left: 3px solid var(--cyan);
+      border-top: 3px solid var(--cyan);
+    }
+
+    .selection-box {
+      position: absolute;
+      left: 39%;
+      top: 50%;
+      width: 94px;
+      height: 66px;
+      border: 1px solid rgba(168, 208, 96, 0.86);
+      background: rgba(168, 208, 96, 0.08);
+      z-index: 1;
+    }
+
+    .map-command-card {
+      position: absolute;
+      right: 18px;
+      bottom: 18px;
+      z-index: 1;
+      min-width: 360px;
+      padding: 10px 12px;
+      background: rgba(4, 8, 6, 0.58);
+      border: 1px solid rgba(168, 208, 96, 0.24);
+      color: var(--warn);
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .bottom-hud {
+      position: absolute;
+      left: 22px;
+      right: 22px;
+      bottom: 20px;
+      height: 268px;
+      display: grid;
+      grid-template-columns: 230px minmax(600px, 1fr) 408px;
+      gap: 16px;
+      padding: 12px 14px;
+      background: var(--hud-deep);
+      border: 1px solid var(--line);
+    }
+
+    .panel {
+      min-width: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .divider {
+      height: 1px;
+      margin: 7px 0;
+      background: var(--line);
+    }
+
+    .minimap-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      width: 188px;
+      margin-top: 9px;
+      position: relative;
+    }
+
+    .mini-cell {
+      height: 37px;
+      border: 1px solid rgba(245, 232, 200, 0.10);
+      background: rgba(45, 55, 47, 0.8);
+    }
+
+    .mini-cell.lit { background: rgba(77, 140, 64, 0.70); }
+    .mini-cell.fog { background: rgba(70, 77, 66, 0.72); }
+    .mini-cell.black { background: rgba(2, 4, 3, 0.92); }
+    .mini-cell.own { background: rgba(168, 208, 96, 0.76); }
+    .mini-cell.enemy { background: rgba(140, 77, 38, 0.82); }
+    .mini-cell.neutral { background: rgba(89, 89, 89, 0.72); }
+
+    .mini-signal {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      transform: translate(-50%, -50%);
+      border: 2px solid var(--warn);
+      background: rgba(230, 196, 107, 0.28);
+      pointer-events: none;
+    }
+
+    .mini-signal.attack {
+      width: 12px;
+      height: 12px;
+      border-color: var(--danger);
+      border-radius: 50%;
+      background: rgba(224, 123, 95, 0.35);
+    }
+
+    .mini-signal.camera {
+      width: 42px;
+      height: 30px;
+      border-color: var(--cyan);
+      background: rgba(94, 200, 224, 0.10);
+    }
+
+    .selection-summary {
+      font-size: 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .selection-layout {
+      display: grid;
+      grid-template-columns: 128px minmax(0, 1fr);
+      gap: 12px;
+      margin-top: 8px;
+      min-width: 0;
+    }
+
+    .portrait-card {
+      height: 154px;
+      padding: 8px;
+      background: rgba(9, 15, 11, 0.78);
+      border: 1px solid rgba(168, 208, 96, 0.28);
+    }
+
+    .portrait-glow {
+      position: relative;
+      height: 94px;
+      border: 1px solid rgba(245, 232, 200, 0.16);
+      background:
+        radial-gradient(circle at 52% 34%, rgba(168, 208, 96, 0.45), transparent 30%),
+        linear-gradient(140deg, rgba(77, 140, 64, 0.55), rgba(28, 58, 31, 0.86));
+      overflow: hidden;
+    }
+
+    .portrait-glow::before {
+      content: "";
+      position: absolute;
+      left: 34px;
+      top: 18px;
+      width: 48px;
+      height: 58px;
+      border: 2px solid rgba(245, 232, 200, 0.58);
+      background: rgba(4, 8, 6, 0.34);
+      clip-path: polygon(50% 0, 88% 30%, 72% 100%, 28% 100%, 12% 30%);
+    }
+
+    .portrait-title {
+      margin-top: 7px;
+      color: var(--verdant-secondary);
+      font-size: 11px;
+      font-weight: 800;
+      overflow: hidden;
+      text-transform: uppercase;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .portrait-subtitle {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .stat-chip {
+      min-width: 0;
+      height: 36px;
+      padding: 5px 7px;
+      background: rgba(5, 10, 7, 0.54);
+      border: 1px solid rgba(245, 232, 200, 0.10);
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .stat-chip strong {
+      display: block;
+      margin-top: 2px;
+      color: var(--verdant-secondary);
+      font-size: 12px;
+    }
+
+    .unit-row {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .unit-card {
+      width: 104px;
+      height: 56px;
+      padding: 6px;
+      background: rgba(24, 43, 31, 0.80);
+      border: 1px solid rgba(168, 208, 96, 0.22);
+      flex: 0 0 auto;
+    }
+
+    .unit-name {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--verdant-accent);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-transform: uppercase;
+    }
+
+    .unit-state {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 10px;
+      text-transform: uppercase;
+    }
+
+    .bar {
+      height: 6px;
+      margin-top: 5px;
+      background: rgba(0, 0, 0, 0.50);
+      border: 1px solid rgba(245, 232, 200, 0.10);
+    }
+
+    .fill {
+      height: 100%;
+      background: var(--verdant-accent);
+    }
+
+    .fill.mana {
+      background: var(--cyan);
+    }
+
+    .production-panel {
+      margin-top: 11px;
+      padding: 8px 10px;
+      background: var(--panel-soft);
+      border: 1px solid rgba(168, 208, 96, 0.18);
+    }
+
+    .production-line,
+    .command-line {
+      font-size: 13px;
+      color: rgba(234, 237, 210, 0.92);
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .queue {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .queue-item {
+      width: 138px;
+      padding: 6px;
+      background: rgba(5, 10, 7, 0.58);
+      border: 1px solid rgba(245, 232, 200, 0.10);
+    }
+
+    .queue-name {
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .command-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 94px);
+      gap: 6px;
+    }
+
+    .command-button {
+      height: 56px;
+      padding: 0;
+      color: var(--text);
+      background: rgba(22, 34, 26, 0.92);
+      border: 1px solid rgba(245, 232, 200, 0.16);
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .command-button:focus-visible {
+      outline: 2px solid var(--cyan);
+      outline-offset: 2px;
+    }
+
+    .command-button.disabled {
+      cursor: default;
+      opacity: 0.48;
+    }
+
+    .command-button.kind-hybrid {
+      border-color: rgba(94, 200, 224, 0.38);
+      background: rgba(15, 42, 46, 0.76);
+    }
+
+    .command-button.kind-train,
+    .command-button.kind-build {
+      border-color: rgba(230, 196, 107, 0.30);
+    }
+
+    .command-inner {
+      display: grid;
+      height: 100%;
+      grid-template-rows: 15px 17px 13px;
+      padding: 4px 6px;
+      align-content: center;
+    }
+
+    .command-key {
+      color: var(--verdant-accent);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .command-name {
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .command-detail {
+      color: var(--muted);
+      font-size: 10px;
+      text-transform: uppercase;
+    }
+
+    .log {
+      margin-top: 9px;
+      padding: 7px 9px;
+      height: 28px;
+      background: rgba(4, 8, 6, 0.60);
+      border: 1px solid rgba(245, 232, 200, 0.10);
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 1250px) {
+      .bottom-hud {
+        grid-template-columns: 210px minmax(520px, 1fr) 390px;
+      }
+
+      .unit-card {
+        width: 92px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="viewport" aria-label="SPLITROOT RTS command preview">
+    <section class="world" aria-hidden="true">
+      <div class="terrain-band"></div>
+      <div class="map-table"></div>
+      <div id="worldEvents"></div>
+    </section>
+
+    <header class="topbar">
+      <div class="brand">
+        <div class="crest"></div>
+        <div>
+          <div class="title">SPLITROOT COMMAND</div>
+          <div class="subline" id="factionLine"></div>
+        </div>
+      </div>
+      <div class="stat-block" id="clockLine"></div>
+      <div class="stat-block" id="siteLine"></div>
+      <div class="stat-block" id="resourceLine"></div>
+    </header>
+
+    <section class="tactical-map" aria-label="Tactical map">
+      <div class="tactical-header">
+        <div>
+          <h1 class="section-title">TACTICAL MAP</h1>
+          <div class="readout" id="visibilityLine"></div>
+        </div>
+      </div>
+      <div class="map-lane"></div>
+      <div class="map-route"></div>
+      <div class="selection-box"></div>
+      <div class="squad-marker"></div>
+      <div class="site-marker site-a"></div>
+      <div class="site-marker site-b"></div>
+      <div class="site-marker site-c"></div>
+      <div class="rally-marker"></div>
+      <div class="enemy-marker"></div>
+      <div class="map-command-card" id="mapCommandLine"></div>
+    </section>
+
+    <section class="bottom-hud" aria-label="RTS command HUD">
+      <aside class="panel">
+        <h2 class="section-title">MINIMAP</h2>
+        <div class="divider"></div>
+        <div class="minimap-grid" id="minimap"></div>
+        <div class="readout" id="miniReadout"></div>
+        <div class="control-strip" id="controlGroups"></div>
+      </aside>
+
+      <section class="panel">
+        <h2 class="section-title">SELECTED UNITS</h2>
+        <div class="divider"></div>
+        <div class="selection-summary" id="selectionLine"></div>
+        <div class="selection-layout">
+          <div class="portrait-card">
+            <div class="portrait-glow" aria-hidden="true"></div>
+            <div class="portrait-title" id="portraitTitle"></div>
+            <div class="portrait-subtitle" id="portraitSubtitle"></div>
+          </div>
+          <div>
+            <div class="stat-grid" id="statGrid"></div>
+            <div class="unit-row" id="unitRow"></div>
+          </div>
+        </div>
+        <div class="production-panel">
+          <div class="command-line" id="commandLine"></div>
+          <div class="production-line" id="productionLine"></div>
+          <div class="queue" id="queue"></div>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <h2 class="section-title">COMMAND CARD</h2>
+        <div class="divider"></div>
+        <div class="command-grid" id="commandGrid"></div>
+        <div class="log" id="commandLog"></div>
+      </aside>
+    </section>
+  </main>
+
+  <script id="previewState" type="application/json">
+  {
+    "faction": "VERDANT CHOIR",
+    "phase": "LIVE",
+    "clock": "04:37",
+    "resources": { "gold": 420, "lumber": 285, "foodUsed": 38, "foodCap": 60, "upkeep": "NO UPKEEP", "supply": 195, "enemySupply": 120, "score": "40-12", "baseAlert": "BASE CLEAR" },
+    "sites": { "own": 2, "enemy": 1, "neutral": 0 },
+    "visibility": { "lit": 5, "fog": 3, "black": 1, "newlyLit": 2 },
+    "selection": {
+      "name": "CANARY SQUAD",
+      "type": "Infantry control group",
+      "controlGroup": "1",
+      "portrait": "THORN CAPTAIN",
+      "level": 3,
+      "damage": "18-24",
+      "armor": 2,
+      "range": "Melee + support",
+      "health": 574,
+      "maxHealth": 630,
+      "mana": 83,
+      "maxMana": 140,
+      "stance": "Attack-move rally",
+      "selected": 1,
+      "units": 4,
+      "lastTarget": "850,-260,120",
+      "orders": 7,
+      "widgetOrders": 3,
+      "sequence": 14
+    },
+    "production": {
+      "train": "READY",
+      "trainCost": 150,
+      "armory": "BUILT",
+      "crossbow": "UNLOCKED",
+      "queue": [
+        { "name": "THORNBOUND", "progress": 0.62 },
+        { "name": "WARD ROOT", "progress": 0.18 }
+      ]
+    },
+    "units": [
+      { "name": "THORN 1", "role": "front", "hp": 150, "maxHp": 150, "mana": 0, "maxMana": 0, "state": "moving" },
+      { "name": "THORN 2", "role": "front", "hp": 122, "maxHp": 150, "mana": 0, "maxMana": 0, "state": "moving" },
+      { "name": "ROOT", "role": "anchor", "hp": 210, "maxHp": 210, "mana": 35, "maxMana": 60, "state": "guarding" },
+      { "name": "WARD", "role": "support", "hp": 92, "maxHp": 120, "mana": 48, "maxMana": 80, "state": "channeling" }
+    ],
+    "commandLog": ["04:37 TRAIN verdant_reinforcement_squad accepted", "04:31 RALLY command_card_rally accepted", "04:22 BUILD armory accepted"],
+    "mapCells": ["black", "fog", "lit", "fog", "fog", "lit", "own", "lit", "lit", "own", "lit", "enemy", "lit", "neutral", "fog", "enemy"],
+    "minimapSignals": [
+      { "x": 68, "y": 54, "type": "ping" },
+      { "x": 82, "y": 72, "type": "attack" },
+      { "x": 46, "y": 48, "type": "camera" }
+    ],
+    "controlGroups": [
+      { "key": "1", "label": "Canary", "active": true },
+      { "key": "2", "label": "Root", "active": false },
+      { "key": "3", "label": "Builder", "active": false },
+      { "key": "F1", "label": "Hero", "active": false }
+    ],
+    "commands": [
+      { "key": "E", "name": "Move", "detail": "ground", "enabled": true, "kind": "order" },
+      { "key": "LMB", "name": "Attack", "detail": "target", "enabled": true, "kind": "order" },
+      { "key": "R", "name": "Rally", "detail": "point", "enabled": true, "kind": "order" },
+      { "key": "TAB", "name": "Leave", "detail": "return FPS", "enabled": true, "kind": "hybrid" },
+      { "key": "B", "name": "Train", "detail": "150 supply", "enabled": true, "kind": "train", "cost": "150s" },
+      { "key": "T", "name": "Build", "detail": "selected tech", "enabled": true, "kind": "build" },
+      { "key": "C", "name": "Tech", "detail": "cycle", "enabled": true, "kind": "build" },
+      { "key": "F", "name": "Take Unit", "detail": "before table", "enabled": false, "kind": "hybrid" },
+      { "key": "S", "name": "Stop", "detail": "next", "enabled": false, "kind": "order" },
+      { "key": "H", "name": "Hold", "detail": "next", "enabled": false, "kind": "order" },
+      { "key": "P", "name": "Patrol", "detail": "next", "enabled": false, "kind": "order" },
+      { "key": "X", "name": "Ping", "detail": "next", "enabled": false, "kind": "signal" }
+    ],
+    "worldEvents": [
+      { "type": "skirmish", "x": 62, "y": 34, "label": "tower fire" },
+      { "type": "move", "x": 48, "y": 54, "label": "squad path" },
+      { "type": "alert", "x": 73, "y": 62, "label": "enemy patrol" }
+    ]
+  }
+  </script>
+
+  <script>
+    const embeddedState = JSON.parse(document.getElementById("previewState").textContent);
+    const state = window.SPLITROOT_RTS_PREVIEW_STATE || embeddedState;
+
+    const commands = state.commands || [
+      { key: "E", name: "Move", detail: "ground", enabled: true, kind: "order" },
+      { key: "LMB", name: "Attack", detail: "target", enabled: true, kind: "order" },
+      { key: "R", name: "Rally", detail: "point", enabled: true, kind: "order" },
+      { key: "TAB", name: "Leave", detail: "return", enabled: true, kind: "hybrid" },
+      { key: "B", name: "Train", detail: "squad", enabled: true, kind: "train" },
+      { key: "T", name: "Build", detail: "tech", enabled: true, kind: "build" },
+      { key: "C", name: "Tech", detail: "cycle", enabled: true, kind: "build" },
+      { key: "F", name: "Take Unit", detail: "before", enabled: false, kind: "hybrid" },
+      { key: "S", name: "Stop", detail: "next", enabled: false, kind: "order" },
+      { key: "H", name: "Hold", detail: "next", enabled: false, kind: "order" },
+      { key: "P", name: "Patrol", detail: "next", enabled: false, kind: "order" },
+      { key: "X", name: "Ping", detail: "next", enabled: false, kind: "signal" }
+    ];
+
+    function pct(value, max) {
+      if (!max) return 0;
+      return Math.max(0, Math.min(100, Math.round((value / max) * 100)));
+    }
+
+    function text(id, value) {
+      document.getElementById(id).textContent = value;
+    }
+
+    function render() {
+      text("factionLine", state.faction);
+      text("clockLine", `MATCH ${state.clock}   ${state.phase}`);
+      document.getElementById("clockLine").insertAdjacentHTML("beforeend", "<span>shared Archon table</span>");
+      text("siteLine", `SITES OWN ${state.sites.own}   ENEMY ${state.sites.enemy}   NEUTRAL ${state.sites.neutral}`);
+      document.getElementById("siteLine").insertAdjacentHTML("beforeend", "<span>map control income</span>");
+      text("resourceLine", `GOLD ${state.resources.gold}   LUMBER ${state.resources.lumber}   FOOD ${state.resources.foodUsed}/${state.resources.foodCap}`);
+      document.getElementById("resourceLine").insertAdjacentHTML("beforeend", `<span>${state.resources.upkeep}   ${state.resources.baseAlert}</span>`);
+      text("visibilityLine", `VISION lit=${state.visibility.lit} fog=${state.visibility.fog} black=${state.visibility.black} newlyLit=${state.visibility.newlyLit}`);
+      text("miniReadout", `VISION ${state.visibility.lit}/${state.visibility.lit + state.visibility.fog + state.visibility.black}`);
+      text("selectionLine", `${state.selection.name}   GROUP ${state.selection.controlGroup}   ${state.selection.type}   ${state.selection.stance}`);
+      text("portraitTitle", state.selection.portrait || state.selection.name);
+      text("portraitSubtitle", `LEVEL ${state.selection.level || "-"}   ${state.selection.type || "selection"}`);
+      text("commandLine", `ORDERS ${state.selection.orders}   WIDGET ORDERS ${state.selection.widgetOrders}   SEQUENCE ${state.selection.sequence}`);
+      text("productionLine", `TRAIN ${state.production.train}   COST ${state.production.trainCost}   ARMORY ${state.production.armory}   CROSSBOW ${state.production.crossbow}`);
+      text("mapCommandLine", `ORDERS ${state.selection.orders}   SEQUENCE ${state.selection.sequence}   ${state.selection.name}`);
+
+      const minimap = document.getElementById("minimap");
+      minimap.replaceChildren(...state.mapCells.map(kind => {
+        const cell = document.createElement("div");
+        cell.className = `mini-cell ${kind}`;
+        return cell;
+      }));
+      for (const signal of state.minimapSignals || []) {
+        const marker = document.createElement("div");
+        marker.className = `mini-signal ${signal.type}`;
+        marker.style.left = `${signal.x}%`;
+        marker.style.top = `${signal.y}%`;
+        minimap.append(marker);
+      }
+
+      const controlGroups = document.getElementById("controlGroups");
+      controlGroups.replaceChildren(...(state.controlGroups || []).map(group => {
+        const pill = document.createElement("div");
+        pill.className = `group-pill ${group.active ? "active" : ""}`;
+        pill.innerHTML = `<span class="group-key">${group.key}</span><span>${group.label}</span>`;
+        return pill;
+      }));
+
+      const statGrid = document.getElementById("statGrid");
+      const stats = [
+        ["Health", `${state.selection.health}/${state.selection.maxHealth}`],
+        ["Mana", `${state.selection.mana}/${state.selection.maxMana}`],
+        ["Damage", state.selection.damage],
+        ["Armor", state.selection.armor],
+        ["Range", state.selection.range],
+        ["Units", state.selection.units],
+        ["Target", state.selection.lastTarget],
+        ["Selected", state.selection.selected]
+      ];
+      statGrid.replaceChildren(...stats.map(([label, value]) => {
+        const chip = document.createElement("div");
+        chip.className = "stat-chip";
+        chip.innerHTML = `${label}<strong>${value}</strong>`;
+        return chip;
+      }));
+
+      const unitRow = document.getElementById("unitRow");
+      unitRow.replaceChildren(...state.units.map(unit => {
+        const card = document.createElement("div");
+        card.className = "unit-card";
+        card.innerHTML = `
+          <div class="unit-name">${unit.name}</div>
+          <div class="unit-state">${unit.role} / ${unit.state}</div>
+          <div class="bar"><div class="fill" style="width:${pct(unit.hp, unit.maxHp)}%"></div></div>
+          <div class="bar"><div class="fill mana" style="width:${pct(unit.mana, unit.maxMana)}%"></div></div>
+        `;
+        return card;
+      }));
+
+      const queue = document.getElementById("queue");
+      queue.replaceChildren(...state.production.queue.map(item => {
+        const row = document.createElement("div");
+        row.className = "queue-item";
+        row.innerHTML = `
+          <div class="queue-name">${item.name}</div>
+          <div class="bar"><div class="fill" style="width:${Math.round(item.progress * 100)}%"></div></div>
+        `;
+        return row;
+      }));
+
+      const grid = document.getElementById("commandGrid");
+      grid.replaceChildren(...commands.map(command => {
+        const button = document.createElement("button");
+        const enabled = command.enabled !== false;
+        button.className = `command-button kind-${command.kind || "order"} ${enabled ? "" : "disabled"}`;
+        button.disabled = !enabled;
+        button.type = "button";
+        button.innerHTML = `
+          <span class="command-inner">
+            <span class="command-key">${command.key}</span>
+            <span class="command-name">${command.name}</span>
+            <span class="command-detail">${command.detail}</span>
+          </span>
+        `;
+        button.addEventListener("click", () => {
+          const stamp = state.clock;
+          state.commandLog.unshift(`${stamp} ${command.name} command_card_preview`);
+          state.selection.sequence += 1;
+          state.selection.orders += 1;
+          render();
+        });
+        return button;
+      }));
+
+      const log = document.getElementById("commandLog");
+      log.textContent = state.commandLog.slice(0, 2).join("   ");
+
+      const worldEvents = document.getElementById("worldEvents");
+      worldEvents.replaceChildren(...state.worldEvents.map(event => {
+        const marker = document.createElement("div");
+        marker.className = `world-event ${event.type}`;
+        marker.style.left = `${event.x}%`;
+        marker.style.top = `${event.y}%`;
+        marker.innerHTML = `<span class="event-label">${event.label}</span>`;
+        return marker;
+      }));
+    }
+
+    render();
+  </script>
+</body>
+</html>

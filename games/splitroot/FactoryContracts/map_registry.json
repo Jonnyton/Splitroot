@@ -1,0 +1,27 @@
+{
+  "schema": "tinyassets.game_factory.map_registry.v1",
+  "authored_at_utc": "2026-06-09T22:55:00Z",
+  "author": "Rook (Claude Fable 5, solo-dev session)",
+  "purpose": "Ordered map rotation + host-pick list for SPLITROOT. UArchonMapRegistryLibrary reads this file at runtime and falls back to C++ literals only if the file is unreadable. The front-end host menu lists these entries; the match loop's Traveling phase advances rotation_order through them. Renegade pattern: ordered server-side rotation, all clients auto-load the next map, no lobby return.",
+  "flag_convention": "Entries carry url_options (Unreal travel-URL options). Runtime gates accept a flag EITHER from the process command line (-Flag, smoke scripts) OR as a travel-URL option (?Flag, rotation/ServerTravel). See UArchonLaunchFlagLibrary.",
+  "maps": [
+    {
+      "map_id": "splitroot_valley",
+      "display_name": "Splitroot Valley",
+      "map_url": "/Engine/Maps/Entry",
+      "url_options": ["ArchonSplitrootValley", "ArchonMatchLoop", "game=/Script/ArchonFactoryCanary.ArchonMatchGameMode"],
+      "shipped": true,
+      "notes": "Worlds-as-code valley: layout library + block actors + runtime lighting on the empty engine map. Two-team v0 match objectives placed (2 base cores, 3 neutral resource sites)."
+    },
+    {
+      "map_id": "canary_range",
+      "display_name": "Canary Range (template)",
+      "map_url": "/Game/FirstPerson/Lvl_FirstPerson",
+      "url_options": [],
+      "shipped": true,
+      "notes": "FPS template map the canary grew up on. Kept in rotation as the second entry so map SWITCHING is testable before a second real map exists. No match objectives — free-roam range."
+    }
+  ],
+  "rotation_order": ["splitroot_valley", "canary_range"],
+  "remix_rule": "Future games on the factory branch swap this file and keep the registry library as the substrate reader/fallback. The registry schema, the dual-source flag convention, and the rotation mechanism are SUBSTRATE."
+}

@@ -1,0 +1,189 @@
+{
+  "schema": "tinyassets.splitroot.unit_asset_candidates.v1",
+  "authored_at_utc": "2026-06-11T16:30:00Z",
+  "owner_lane": "Ledger",
+  "purpose": "Local, per-game unit/body/item art candidate inventory for SPLITROOT. This is operational evidence for assets already present or approved, not final art direction.",
+  "live_canary_constraint": "Do not run import/build commandlets that require closing the live SPLITROOT canary. Keep the running game alive and record pending imports instead.",
+  "global_status": {
+    "infinity_blade_collection": {
+      "approval": "approved_asap",
+      "local_status": "blocked_not_locally_obtainable",
+      "evidence": [
+        "Saved/Proof/legendary-list-include-ue.json contained 25 entries: UE 5.0-5.8, Fab UE Plugin 5.3-5.8, Quixel Bridge 5.0-5.8, Fortnite, and Fortnite_StWContent only.",
+        "C:/ProgramData/Epic/EpicGamesLauncher/VaultCache contains FabLibrary only; no Infinity Blade folders.",
+        "Local Epic launcher manifests dated 2026-06-11 list UE/Fab/Bridge/Fortnite, not Infinity Blade or Paragon packs."
+      ],
+      "next_step": "Needs Epic/Fab library entitlement or a non-GUI downloader path. Do not use GUI focus/click work while Jonathan's live canary is running."
+    },
+    "approved_paragon_packs": {
+      "approval": "approved_selectively",
+      "local_status": "not_downloaded",
+      "next_step": "Bring in only when a specific faction/shop row needs them and a safe non-disruptive download path exists."
+    }
+  },
+  "candidates": [
+    {
+      "id": "fab_rogue_character_model",
+      "title": "Rogue Character Model",
+      "listing_uid": "15e2afd1-11c0-4679-832c-ebbfb6162583",
+      "seller": "Khempavee",
+      "rating": 5,
+      "reviews": 12,
+      "ai_generated": false,
+      "formats": ["Unreal Engine", "FBX", "Maya", "Additional files"],
+      "local_status": "ue_imported",
+      "source_path": "Content/Fab_15e2afd1_Rogue_Character_Model/fbx/rogue_all.fbx",
+      "game_paths": [
+        "/Game/Fab/Library/Rogue_Character_Model/rogue_all",
+        "/Game/Fab/Library/Rogue_Character_Model/rogue_all_Skeleton"
+      ],
+      "best_fit": [
+        {
+          "faction": "LenswrightCompact",
+          "role": "Scout, skirmisher, or early pressure-bolt infantry placeholder until approved Greystone/Terra/Kwang assets land.",
+          "reason": "Human, rigged, Epic Skeleton compatible, modular material set; can carry mechanical/optic silhouette additions later."
+        },
+        {
+          "faction": "VerdantChoir",
+          "role": "Temporary agile archer/runner body if Verdant needs a non-mannequin first pass.",
+          "reason": "Medieval fantasy human read, but less organic than ideal Verdant art direction."
+        }
+      ],
+      "risk": "Needs visual verification in frame before claiming in-game use."
+    },
+    {
+      "id": "fab_fantasy_game_character",
+      "title": "Fantasy Game Character",
+      "listing_uid": "f065c0cd-7eaf-4c29-b30d-fe935420c665",
+      "seller": "Color Studio",
+      "rating": 0,
+      "reviews": 0,
+      "ai_generated": true,
+      "formats": ["FBX", "OBJ", "GLB", "Converted Files"],
+      "local_status": "ue_imported_placeholder_only",
+      "source_path": "Content/Fab_f065c0cd_Fantasy_Game_Character/fbx/fantasy_game_character_f.fbx",
+      "game_paths": [
+        "/Game/Fab/Fantasy_Game_Character/fantasy_game_character_f",
+        "/Game/Fab/Fantasy_Game_Character/fantasy_game_character_f_Skeleton"
+      ],
+      "best_fit": [
+        {
+          "faction": "VerdantChoir",
+          "role": "Low-priority temporary generic fantasy body.",
+          "reason": "Fantasy/warrior tags and imported UE skeletal path exist, but AI-generated and zero-review status make it a placeholder, not an identity anchor."
+        }
+      ],
+      "risk": "AI-generated; avoid as a faction-defining asset."
+    },
+    {
+      "id": "fab_lizard_kin_warrior",
+      "title": "Lizard Kin Warrior Character Rig",
+      "listing_uid": "bf70b6c1-ccd4-4687-8d10-9e49cc1c67c8",
+      "seller": "DM-913",
+      "rating": 5,
+      "reviews": 2,
+      "ai_generated": false,
+      "formats": ["Blender", "Additional files", "Converted Files"],
+      "local_status": "raw_source_present_import_pending",
+      "source_path": "Content/Fab_bf70b6c1_Lizard_Kin_Warrior_Character_Rig/glb/converted/lizard_kin_warrior_character_rig.glb",
+      "planned_game_path": "/Game/Fab/Library/Lizard_Kin_Warrior_Character_Rig",
+      "import_task_key": "Fab_bf70b6c1_Lizard_Kin_Warrior_Character_Rig|lizard_kin_warrior_character_rig",
+      "best_fit": [
+        {
+          "faction": "KinwildCovenant",
+          "role": "Spear hunter, beast-pact elite, or late-tech creature infantry.",
+          "reason": "Creature/lizard/warrior/spear tags match Kinwild hunt-pact silhouette much better than current mannequins."
+        }
+      ],
+      "risk": "Raw GLB still needs UE import and animation/rig verification."
+    },
+    {
+      "id": "fab_low_poly_wolf",
+      "title": "Low Poly wolf",
+      "listing_uid": "c5747f8f-fb80-48c8-a0fd-c663877630c7",
+      "seller": "ManNeko",
+      "rating": 5,
+      "reviews": 2,
+      "ai_generated": false,
+      "formats": ["FBX", "Converted Files", "Blender", "GLB"],
+      "local_status": "raw_source_present_import_pending",
+      "source_path": "Content/Fab_c5747f8f_Low_Poly_wolf/fbx/low_poly_wolf.fbx",
+      "planned_game_path": "/Game/Fab/Library/Low_Poly_wolf",
+      "import_task_key": "Fab_c5747f8f_Low_Poly_wolf|low_poly_wolf",
+      "best_fit": [
+        {
+          "faction": "KinwildCovenant",
+          "role": "Companion silhouette, scout summon, beast-den shop unlock, or neutral wildlife stand-in.",
+          "reason": "Directly supports the Kinwild companion silhouette contract and the pack/animal faction read."
+        }
+      ],
+      "risk": "Low-poly style may be too simple for final AAA target; useful for gameplay readability and companion prototype."
+    },
+    {
+      "id": "fab_free_stylized_assassin",
+      "title": "Free Stylized Assassin",
+      "listing_uid": "a50c1425-a103-48fc-a546-602d3afb5fe1",
+      "seller": "LapaModels",
+      "rating": 5,
+      "reviews": 2,
+      "ai_generated": true,
+      "formats": ["GLB"],
+      "local_status": "raw_source_present_import_pending_low_priority",
+      "source_paths": [
+        "Content/Fab_a50c1425_Free_Stylized_Assassin/glb/free_stylized_assasin_extracted/26b3a27cad0e4f50ea4214bcbdab2797.glb",
+        "Content/Fab_a50c1425_Free_Stylized_Assassin/glb/free_stylized_assasin_extracted/a8ebc640aba3584b022037daeaa7b14e.glb"
+      ],
+      "planned_game_path": "/Game/Fab/Library/Free_Stylized_Assassin",
+      "import_task_keys": [
+        "Fab_a50c1425_Free_Stylized_Assassin|26b3a27cad0e4f50ea4214bcbdab2797",
+        "Fab_a50c1425_Free_Stylized_Assassin|a8ebc640aba3584b022037daeaa7b14e"
+      ],
+      "best_fit": [
+        {
+          "faction": "VerdantChoir",
+          "role": "Low-priority shadow-runner or rogue placeholder.",
+          "reason": "Humanoid agile silhouette, but AI-generated and stylized; not a final identity anchor."
+        }
+      ],
+      "risk": "AI-generated and GLB-only; import after stronger non-AI assets unless a quick placeholder is needed."
+    }
+  ],
+  "first_pass_unit_slots": [
+    {
+      "slot": "lenswright_pressure_runner",
+      "shop_item_id": "lenswright_pressure_runner",
+      "shop_row_kind": "Unit",
+      "faction": "LenswrightCompact",
+      "preferred_candidate": "fab_rogue_character_model",
+      "tech_unlock": "Armory",
+      "shop_role": "Early skirmisher/item body; later swap to approved Greystone/Terra/Kwang or Infinity Blade weaponized kit."
+    },
+    {
+      "slot": "kinwild_spear_hunter",
+      "shop_item_id": "kinwild_spear_hunter",
+      "shop_row_kind": "Unit",
+      "faction": "KinwildCovenant",
+      "preferred_candidate": "fab_lizard_kin_warrior",
+      "tech_unlock": "BeastDen",
+      "shop_role": "Creature infantry/body unlock once import is safe."
+    },
+    {
+      "slot": "kinwild_pack_companion",
+      "shop_item_id": "kinwild_pack_companion",
+      "shop_row_kind": "Unit",
+      "faction": "KinwildCovenant",
+      "preferred_candidate": "fab_low_poly_wolf",
+      "tech_unlock": "BeastDen",
+      "shop_role": "Companion summon or scout item row."
+    },
+    {
+      "slot": "verdant_temporary_runner",
+      "shop_item_id": "verdant_temporary_runner",
+      "shop_row_kind": "Unit",
+      "faction": "VerdantChoir",
+      "preferred_candidate": "fab_fantasy_game_character",
+      "tech_unlock": "Grove",
+      "shop_role": "Temporary body only until approved The Fey/Morigesh or better organic assets are available."
+    }
+  ]
+}

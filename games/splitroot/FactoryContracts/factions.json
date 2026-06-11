@@ -1,0 +1,37 @@
+{
+  "schema": "tinyassets.game_factory.factions.v2",
+  "renamed_from_schema": "tinyassets.game_factory.factions.v1",
+  "renamed_at_utc": "2026-05-24T07:45:00Z",
+  "renamed_reason": "Align with committed faction names from pages/notes/pages-notes-splitroot-name-and-design-foundation-2026-05-23 (Verdant Choir / Kinwild Covenant / Lenswright Compact). Prior IDs (verdant_court / wildbond_clans / brassroot_artificers) predated the naming commit.",
+  "factions": [
+    {
+      "id": "verdant_choir",
+      "display_name": "Verdant Choir",
+      "direction": "forest, root, choral plant power",
+      "role": "terrain control, growing walls, root-vault mobility, healing groves, agile defenders",
+      "movement_verb": "VerdantRootVault",
+      "no_gunpowder": false,
+      "lineage_hooks": "Living arrows, thornsprout swarms, bramble walls"
+    },
+    {
+      "id": "kinwild_covenant",
+      "display_name": "Kinwild Covenant",
+      "direction": "animal, beast, hunt-pact power",
+      "role": "pack pressure, bonded beasts, shapeshift bursts, scouting, shock assaults, bound-leap mobility",
+      "movement_verb": "KinwildBoundLeap",
+      "no_gunpowder": false,
+      "lineage_hooks": "Beast bites, hunt horns, scent-track scouts, shapeshift ambush"
+    },
+    {
+      "id": "lenswright_compact",
+      "display_name": "Lenswright Compact",
+      "direction": "pre-gunpowder science: clockwork, optics, pressure, alchemy",
+      "role": "siege tools, deployable field works, pressure-thrust mobility, optical scouts, alchemical fire",
+      "movement_verb": "LenswrightPressureThrust",
+      "no_gunpowder": true,
+      "lineage_hooks": "Pressure-bolt crossbows, clockwork limbs, alchemical flasks, ballistas, optic spyglass. EXPLICITLY no muzzle flashes, no powder smoke, no firearms."
+    }
+  ],
+  "legal_distinctness": "These are original fantasy directions and should not copy protected units, names, art, lore, or UI from reference games.",
+  "engine_enum": "EArchonFaction { None, VerdantChoir, KinwildCovenant, LenswrightCompact }"
+}
