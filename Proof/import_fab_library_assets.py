@@ -7,7 +7,7 @@ import traceback
 import unreal
 
 
-PROJECT_ROOT = r"C:\Users\Jonathan\Projects\Users\archon-rts-fps-factory"
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 RESULT_PATH = os.path.join(PROJECT_ROOT, "Saved", "Proof", "last-fab-library-import.json")
 SELECTED_KEY = os.environ.get("FAB_LIBRARY_SELECTED_KEY", "").strip()
 INVENTORY_ONLY = os.environ.get("FAB_LIBRARY_INVENTORY_ONLY", "").strip() == "1"
