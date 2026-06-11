@@ -42,7 +42,7 @@ namespace
 
 	const FDateTime GArchonProcessStartUtc = FDateTime::UtcNow();
 
-	FString FormatUtcOrMissing(const FDateTime& Timestamp)
+	FString FormatMatchUtcOrMissing(const FDateTime& Timestamp)
 	{
 		return Timestamp.GetTicks() > 0 ? Timestamp.ToIso8601() : FString(TEXT("missing"));
 	}
@@ -205,13 +205,13 @@ void AArchonMatchStateActor::InitializeMatch(
 	const FString ModuleDllPath = ResolveModuleDllPath();
 	const FDateTime ModuleDllTimestampUtc = IFileManager::Get().GetTimeStamp(*ModuleDllPath);
 	const FDateTime RuntimeInputTimestampUtc = ResolveRuntimeInputUtc();
-	const FString ModuleDllUtc = FormatUtcOrMissing(ModuleDllTimestampUtc);
+	const FString ModuleDllUtc = FormatMatchUtcOrMissing(ModuleDllTimestampUtc);
 	const FString ProcessStartUtc = GArchonProcessStartUtc.ToIso8601();
-	const FString RuntimeInputUtc = FormatUtcOrMissing(RuntimeInputTimestampUtc);
+	const FString RuntimeInputUtc = FormatMatchUtcOrMissing(RuntimeInputTimestampUtc);
 	EffectiveBuildModuleUtc = ModuleDllUtc;
 	EffectiveBuildRuntimeUtc = RuntimeInputUtc;
 	EffectiveBuildUtc = ProcessStartUtc;
-	EffectiveBuildVersion = MakeBuildVersion(FormatUtcOrMissing(MaxTimestamp(ModuleDllTimestampUtc, RuntimeInputTimestampUtc)));
+	EffectiveBuildVersion = MakeBuildVersion(FormatMatchUtcOrMissing(MaxTimestamp(ModuleDllTimestampUtc, RuntimeInputTimestampUtc)));
 	UE_LOG(
 		LogTemp,
 		Display,

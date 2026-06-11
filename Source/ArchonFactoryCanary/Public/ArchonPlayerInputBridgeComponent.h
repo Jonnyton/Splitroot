@@ -11,6 +11,7 @@
 class AArchonMapTableActor;
 class AArchonMatchStateActor;
 class ACharacter;
+class APawn;
 class APlayerController;
 class SWidget;
 class UArchonMapTableInteractorComponent;
@@ -114,6 +115,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Archon|Input")
 	void SetMouseLookScale(float NewScale);
 
+	UFUNCTION(BlueprintPure, Category = "Archon|Input")
+	float GetFlyAroundSpeed() const { return FlyAroundSpeed; }
+
+	UFUNCTION(BlueprintCallable, Category = "Archon|Input")
+	void SetFlyAroundSpeed(float NewSpeed);
+
 	UFUNCTION(BlueprintCallable, Category = "Archon|Input")
 	void QuitToMainMenu();
 
@@ -122,6 +129,16 @@ public:
 
 	static constexpr float MinMouseLookScale = 0.01f;
 	static constexpr float MaxMouseLookScale = 0.25f;
+	static constexpr float DefaultMouseLookScale = 0.07f;
+	static constexpr float MinFlyAroundSpeed = 300.0f;
+	static constexpr float MaxFlyAroundSpeed = 6000.0f;
+	static constexpr float DefaultFlyAroundSpeed = 1200.0f;
+
+	UFUNCTION(BlueprintPure, Category = "Archon|Input")
+	static float ClampMouseLookScale(float NewScale);
+
+	UFUNCTION(BlueprintPure, Category = "Archon|Input")
+	static float ClampFlyAroundSpeed(float NewSpeed);
 
 	UFUNCTION(BlueprintPure, Category = "Archon|Input")
 	bool IsRuntimeBridgeInstalled() const { return bRuntimeBridgeInstalled; }
@@ -165,6 +182,7 @@ private:
 	void ApplyStandardFpsLook(APlayerController& Controller);
 	void ApplyStandardFpsMovement(APlayerController& Controller);
 	void ApplyStandardFpsMobility(APlayerController& Controller);
+	void ApplyFlyAroundSpeed(APawn& Pawn) const;
 	void HandleMapTableInput(APlayerController& Controller);
 	void HandleFpsWeaponInput(APlayerController& Controller);
 	void RequestReinforcementPurchase();
@@ -239,5 +257,6 @@ private:
 	int32 SelectedTechBuildingIndex = 0;
 	float DefaultWalkSpeed = 600.0f;
 	float SprintWalkSpeed = 900.0f;
-	float MouseLookScale = 0.07f;
+	float MouseLookScale = DefaultMouseLookScale;
+	float FlyAroundSpeed = DefaultFlyAroundSpeed;
 };

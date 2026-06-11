@@ -17,6 +17,8 @@
 #include "Engine/GameViewportClient.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/FloatingPawnMovement.h"
+#include "GameFramework/PawnMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "HAL/PlatformFileManager.h"
 #include "InputCoreTypes.h"
@@ -62,6 +64,32 @@ namespace
 	{
 		return TechId.IsNone() ? 0 : 5;
 	}
+
+	bool LoadArchonControlFloat(const TCHAR* KeyName, float& OutValue)
+	{
+		if (!GConfig)
+		{
+			return false;
+		}
+
+		if (GConfig->GetFloat(TEXT("ArchonControls"), KeyName, OutValue, GGameUserSettingsIni))
+		{
+			return true;
+		}
+
+		return GConfig->GetFloat(TEXT("ArchonControls"), KeyName, OutValue, GGameIni);
+	}
+
+	void SaveArchonControlFloat(const TCHAR* KeyName, float Value)
+	{
+		if (!GConfig)
+		{
+			return;
+		}
+
+		GConfig->SetFloat(TEXT("ArchonControls"), KeyName, Value, GGameUserSettingsIni);
+		GConfig->Flush(false, GGameUserSettingsIni);
+	}
 }
 
 UArchonPlayerInputBridgeComponent::UArchonPlayerInputBridgeComponent()
@@ -75,12 +103,19 @@ void UArchonPlayerInputBridgeComponent::BeginPlay()
 	Super::BeginPlay();
 	PlayerController = ResolvePlayerController();
 
-	// User setting: look speed persists across sessions (pause-menu slider).
+	// User settings: pause-menu sliders define the defaults for future matches.
 	float SavedScale = 0.0f;
-	if (GConfig && GConfig->GetFloat(TEXT("ArchonControls"), TEXT("MouseLookScale"), SavedScale, GGameUserSettingsIni) && SavedScale > 0.0f)
+	if (LoadArchonControlFloat(TEXT("MouseLookScale"), SavedScale) && SavedScale > 0.0f)
 	{
-		MouseLookScale = FMath::Clamp(SavedScale, MinMouseLookScale, MaxMouseLookScale);
+		MouseLookScale = ClampMouseLookScale(SavedScale);
 		UE_LOG(LogTemp, Display, TEXT("ArchonFactoryCanary: MouseLookScaleLoaded scale=%.3f"), MouseLookScale);
+	}
+
+	float SavedFlySpeed = 0.0f;
+	if (LoadArchonControlFloat(TEXT("FlyAroundSpeed"), SavedFlySpeed) && SavedFlySpeed > 0.0f)
+	{
+		FlyAroundSpeed = ClampFlyAroundSpeed(SavedFlySpeed);
+		UE_LOG(LogTemp, Display, TEXT("ArchonFactoryCanary: FlyAroundSpeedLoaded speed=%.0f"), FlyAroundSpeed);
 	}
 }
 
@@ -2010,13 +2045,33 @@ bool UArchonPlayerInputBridgeComponent::ClosePauseMenu()
 
 void UArchonPlayerInputBridgeComponent::SetMouseLookScale(float NewScale)
 {
-	MouseLookScale = FMath::Clamp(NewScale, MinMouseLookScale, MaxMouseLookScale);
-	if (GConfig)
+	MouseLookScale = ClampMouseLookScale(NewScale);
+	SaveArchonControlFloat(TEXT("MouseLookScale"), MouseLookScale);
+	UE_LOG(LogTemp, Display, TEXT("ArchonFactoryCanary: MouseLookDefaultChanged scale=%.3f"), MouseLookScale);
+}
+
+void UArchonPlayerInputBridgeComponent::SetFlyAroundSpeed(float NewSpeed)
+{
+	FlyAroundSpeed = ClampFlyAroundSpeed(NewSpeed);
+	SaveArchonControlFloat(TEXT("FlyAroundSpeed"), FlyAroundSpeed);
+	if (APlayerController* Controller = ResolvePlayerController())
 	{
-		GConfig->SetFloat(TEXT("ArchonControls"), TEXT("MouseLookScale"), MouseLookScale, GGameUserSettingsIni);
-		GConfig->Flush(false, GGameUserSettingsIni);
+		if (APawn* Pawn = Controller->GetPawn())
+		{
+			ApplyFlyAroundSpeed(*Pawn);
+		}
 	}
-	UE_LOG(LogTemp, Display, TEXT("ArchonFactoryCanary: MouseLookScaleChanged scale=%.3f"), MouseLookScale);
+	UE_LOG(LogTemp, Display, TEXT("ArchonFactoryCanary: FlyAroundDefaultChanged speed=%.0f"), FlyAroundSpeed);
+}
+
+float UArchonPlayerInputBridgeComponent::ClampMouseLookScale(float NewScale)
+{
+	return FMath::Clamp(NewScale, MinMouseLookScale, MaxMouseLookScale);
+}
+
+float UArchonPlayerInputBridgeComponent::ClampFlyAroundSpeed(float NewSpeed)
+{
+	return FMath::Clamp(NewSpeed, MinFlyAroundSpeed, MaxFlyAroundSpeed);
 }
 
 void UArchonPlayerInputBridgeComponent::QuitToMainMenu()
@@ -2105,6 +2160,7 @@ void UArchonPlayerInputBridgeComponent::ApplyStandardFpsMovement(APlayerControll
 	{
 		return;
 	}
+	ApplyFlyAroundSpeed(*Pawn);
 
 	const float ForwardInput =
 		(Controller.IsInputKeyDown(EKeys::W) ? 1.0f : 0.0f) +
@@ -2112,6 +2168,9 @@ void UArchonPlayerInputBridgeComponent::ApplyStandardFpsMovement(APlayerControll
 	const float RightInput =
 		(Controller.IsInputKeyDown(EKeys::D) ? 1.0f : 0.0f) +
 		(Controller.IsInputKeyDown(EKeys::A) ? -1.0f : 0.0f);
+	const float UpInput =
+		(Cast<ACharacter>(Pawn) ? 0.0f : (Controller.IsInputKeyDown(EKeys::SpaceBar) ? 1.0f : 0.0f)) +
+		(Cast<ACharacter>(Pawn) ? 0.0f : ((Controller.IsInputKeyDown(EKeys::LeftControl) || Controller.IsInputKeyDown(EKeys::C)) ? -1.0f : 0.0f));
 
 	const FRotator ControlYaw(0.0f, Controller.GetControlRotation().Yaw, 0.0f);
 	if (!FMath::IsNearlyZero(ForwardInput))
@@ -2123,6 +2182,33 @@ void UArchonPlayerInputBridgeComponent::ApplyStandardFpsMovement(APlayerControll
 	{
 		Pawn->AddMovementInput(FRotationMatrix(ControlYaw).GetUnitAxis(EAxis::Y), RightInput);
 	}
+
+	if (!FMath::IsNearlyZero(UpInput))
+	{
+		Pawn->AddMovementInput(FVector::UpVector, UpInput);
+	}
+}
+
+void UArchonPlayerInputBridgeComponent::ApplyFlyAroundSpeed(APawn& Pawn) const
+{
+	if (Cast<ACharacter>(&Pawn))
+	{
+		return;
+	}
+
+	UFloatingPawnMovement* Movement = Cast<UFloatingPawnMovement>(Pawn.GetMovementComponent());
+	if (!Movement)
+	{
+		Movement = Pawn.FindComponentByClass<UFloatingPawnMovement>();
+	}
+	if (!Movement)
+	{
+		return;
+	}
+
+	Movement->MaxSpeed = FlyAroundSpeed;
+	Movement->Acceleration = FlyAroundSpeed * (4000.0f / DefaultFlyAroundSpeed);
+	Movement->Deceleration = FlyAroundSpeed * (12000.0f / DefaultFlyAroundSpeed);
 }
 
 void UArchonPlayerInputBridgeComponent::ApplyStandardFpsMobility(APlayerController& Controller)

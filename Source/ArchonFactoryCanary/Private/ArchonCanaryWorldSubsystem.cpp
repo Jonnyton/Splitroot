@@ -3625,22 +3625,27 @@ void UArchonCanaryWorldSubsystem::ExecutePauseMenuProof()
 		return;
 	}
 
-	// Same handlers the Escape key and the slider drive. Restore the
-	// user's saved look scale afterward — the proof must not overwrite
-	// a real setting in GameUserSettings.ini.
+	// Same handlers the Escape key and the sliders drive. Restore the
+	// user's saved defaults afterward — the proof must not overwrite
+	// real settings in GameUserSettings.ini.
 	const float OriginalScale = RuntimeInputBridge->GetMouseLookScale();
+	const float OriginalFlySpeed = RuntimeInputBridge->GetFlyAroundSpeed();
 	const bool bOpened = RuntimeInputBridge->TogglePauseMenu();
 	RuntimeInputBridge->SetMouseLookScale(0.12f);
+	RuntimeInputBridge->SetFlyAroundSpeed(2400.0f);
 	const float ProofScale = RuntimeInputBridge->GetMouseLookScale();
+	const float ProofFlySpeed = RuntimeInputBridge->GetFlyAroundSpeed();
 	const bool bClosed = RuntimeInputBridge->TogglePauseMenu();
 	RuntimeInputBridge->SetMouseLookScale(OriginalScale);
+	RuntimeInputBridge->SetFlyAroundSpeed(OriginalFlySpeed);
 	UE_LOG(
 		LogTemp,
 		Display,
-		TEXT("ArchonFactoryCanary: PauseMenuProofCompleted opened=%s closed=%s scale=%.3f"),
+		TEXT("ArchonFactoryCanary: PauseMenuProofCompleted opened=%s closed=%s scale=%.3f flySpeed=%.0f"),
 		bOpened ? TEXT("true") : TEXT("false"),
 		bClosed ? TEXT("true") : TEXT("false"),
-		ProofScale);
+		ProofScale,
+		ProofFlySpeed);
 }
 
 void UArchonCanaryWorldSubsystem::RunClientFireProofIfRequested()

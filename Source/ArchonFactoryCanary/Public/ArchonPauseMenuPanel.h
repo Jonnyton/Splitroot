@@ -29,6 +29,9 @@ private:
 	void HandleLookScaleChanged(float NewNormalizedValue);
 	float GetLookScaleNormalized() const;
 	FText GetLookScaleText() const;
+	void HandleFlySpeedChanged(float NewNormalizedValue);
+	float GetFlySpeedNormalized() const;
+	FText GetFlySpeedText() const;
 
 	TWeakObjectPtr<UArchonPlayerInputBridgeComponent> InputBridge;
 };

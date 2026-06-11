@@ -35,6 +35,7 @@ namespace
 		{ TEXT("N"),           TEXT("Bot match: next player view") },
 		{ TEXT("M"),           TEXT("Bot match: shared match view") },
 		{ TEXT("F"),           TEXT("Bot match: take control / release") },
+		{ TEXT("SPACE / CTRL"), TEXT("Spectator fly up / down") },
 		{ TEXT("ESC"),         TEXT("This menu") },
 	};
 }
@@ -126,7 +127,7 @@ void SArchonPauseMenuPanel::Construct(const FArguments& InArgs)
 				.WidthOverride(175.0f)
 				[
 					SNew(STextBlock)
-					.Text(NSLOCTEXT("ArchonPauseMenu", "LookSpeed", "MOUSE LOOK SPEED"))
+					.Text(NSLOCTEXT("ArchonPauseMenu", "LookSpeed", "MOUSE LOOK DEFAULT"))
 					.Font(FCoreStyle::GetDefaultFontStyle("Bold", 13))
 				]
 			]
@@ -145,6 +146,42 @@ void SArchonPauseMenuPanel::Construct(const FArguments& InArgs)
 			[
 				SNew(STextBlock)
 				.Text(this, &SArchonPauseMenuPanel::GetLookScaleText)
+				.Font(FCoreStyle::GetDefaultFontStyle("Regular", 13))
+			]
+		];
+
+	Rows->AddSlot()
+		.AutoHeight()
+		.Padding(0.0f, 8.0f, 0.0f, 2.0f)
+		[
+			SNew(SHorizontalBox)
+			+ SHorizontalBox::Slot()
+			.AutoWidth()
+			.VAlign(VAlign_Center)
+			[
+				SNew(SBox)
+				.WidthOverride(175.0f)
+				[
+					SNew(STextBlock)
+					.Text(NSLOCTEXT("ArchonPauseMenu", "FlySpeed", "FLY SPEED DEFAULT"))
+					.Font(FCoreStyle::GetDefaultFontStyle("Bold", 13))
+				]
+			]
+			+ SHorizontalBox::Slot()
+			.FillWidth(1.0f)
+			.VAlign(VAlign_Center)
+			.Padding(0.0f, 0.0f, 8.0f, 0.0f)
+			[
+				SNew(SSlider)
+				.Value(this, &SArchonPauseMenuPanel::GetFlySpeedNormalized)
+				.OnValueChanged(this, &SArchonPauseMenuPanel::HandleFlySpeedChanged)
+			]
+			+ SHorizontalBox::Slot()
+			.AutoWidth()
+			.VAlign(VAlign_Center)
+			[
+				SNew(STextBlock)
+				.Text(this, &SArchonPauseMenuPanel::GetFlySpeedText)
 				.Font(FCoreStyle::GetDefaultFontStyle("Regular", 13))
 			]
 		];
@@ -262,6 +299,39 @@ FText SArchonPauseMenuPanel::GetLookScaleText() const
 	if (const UArchonPlayerInputBridgeComponent* Bridge = InputBridge.Get())
 	{
 		return FText::FromString(FString::Printf(TEXT("%.3f"), Bridge->GetMouseLookScale()));
+	}
+	return FText::GetEmpty();
+}
+
+void SArchonPauseMenuPanel::HandleFlySpeedChanged(float NewNormalizedValue)
+{
+	if (UArchonPlayerInputBridgeComponent* Bridge = InputBridge.Get())
+	{
+		const float Speed = FMath::Lerp(
+			UArchonPlayerInputBridgeComponent::MinFlyAroundSpeed,
+			UArchonPlayerInputBridgeComponent::MaxFlyAroundSpeed,
+			FMath::Clamp(NewNormalizedValue, 0.0f, 1.0f));
+		Bridge->SetFlyAroundSpeed(Speed);
+	}
+}
+
+float SArchonPauseMenuPanel::GetFlySpeedNormalized() const
+{
+	if (const UArchonPlayerInputBridgeComponent* Bridge = InputBridge.Get())
+	{
+		return FMath::GetRangePct(
+			UArchonPlayerInputBridgeComponent::MinFlyAroundSpeed,
+			UArchonPlayerInputBridgeComponent::MaxFlyAroundSpeed,
+			Bridge->GetFlyAroundSpeed());
+	}
+	return 0.0f;
+}
+
+FText SArchonPauseMenuPanel::GetFlySpeedText() const
+{
+	if (const UArchonPlayerInputBridgeComponent* Bridge = InputBridge.Get())
+	{
+		return FText::FromString(FString::Printf(TEXT("%.0f"), Bridge->GetFlyAroundSpeed()));
 	}
 	return FText::GetEmpty();
 }

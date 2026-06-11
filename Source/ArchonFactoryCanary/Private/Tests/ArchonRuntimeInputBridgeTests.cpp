@@ -22,6 +22,40 @@ namespace
 }
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+	FArchonRuntimeInputBridgeControlDefaultRangesTest,
+	"ArchonFactory.RuntimeInputBridge.ControlDefaultRanges",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FArchonRuntimeInputBridgeControlDefaultRangesTest::RunTest(const FString& Parameters)
+{
+	TestTrue(
+		TEXT("Mouse look default sits inside player-adjustable range"),
+		UArchonPlayerInputBridgeComponent::DefaultMouseLookScale >= UArchonPlayerInputBridgeComponent::MinMouseLookScale &&
+		UArchonPlayerInputBridgeComponent::DefaultMouseLookScale <= UArchonPlayerInputBridgeComponent::MaxMouseLookScale);
+	TestTrue(
+		TEXT("Fly-around default sits inside player-adjustable range"),
+		UArchonPlayerInputBridgeComponent::DefaultFlyAroundSpeed >= UArchonPlayerInputBridgeComponent::MinFlyAroundSpeed &&
+		UArchonPlayerInputBridgeComponent::DefaultFlyAroundSpeed <= UArchonPlayerInputBridgeComponent::MaxFlyAroundSpeed);
+	TestEqual(
+		TEXT("Mouse look clamps below minimum"),
+		UArchonPlayerInputBridgeComponent::ClampMouseLookScale(0.0f),
+		UArchonPlayerInputBridgeComponent::MinMouseLookScale);
+	TestEqual(
+		TEXT("Mouse look clamps above maximum"),
+		UArchonPlayerInputBridgeComponent::ClampMouseLookScale(10.0f),
+		UArchonPlayerInputBridgeComponent::MaxMouseLookScale);
+	TestEqual(
+		TEXT("Fly speed clamps below minimum"),
+		UArchonPlayerInputBridgeComponent::ClampFlyAroundSpeed(0.0f),
+		UArchonPlayerInputBridgeComponent::MinFlyAroundSpeed);
+	TestEqual(
+		TEXT("Fly speed clamps above maximum"),
+		UArchonPlayerInputBridgeComponent::ClampFlyAroundSpeed(10000.0f),
+		UArchonPlayerInputBridgeComponent::MaxFlyAroundSpeed);
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 	FArchonRuntimeInputBridgePreviewUpdatesVisibleMapTableTest,
 	"ArchonFactory.RuntimeInputBridge.PreviewUpdatesVisibleMapTable",
 	EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
