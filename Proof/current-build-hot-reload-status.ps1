@@ -300,6 +300,7 @@ $result = [pscustomobject]@{
         EffectiveLogPath = $effectiveLogPath
         EffectiveBuildFingerprint = $effectiveFingerprint
         EffectiveVersion = Get-FingerprintField $effectiveFingerprint 'version'
+        EffectiveUtc = Get-FingerprintField $effectiveFingerprint 'effectiveUtc'
         EffectiveModuleDllUtc = Get-FingerprintField $effectiveFingerprint 'moduleDllUtc'
         EffectiveProcessStartUtc = Get-FingerprintField $effectiveFingerprint 'processStartUtc'
         ModuleDllPath = $moduleDllPath
