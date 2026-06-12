@@ -20,6 +20,17 @@ function Test-Directory($RelativePath) {
     }
 }
 
+function Read-JsonOrNull([string]$Path) {
+    if (-not $Path -or -not (Test-Path -LiteralPath $Path -PathType Leaf)) {
+        return $null
+    }
+    try {
+        return Get-Content -LiteralPath $Path -Raw | ConvertFrom-Json
+    } catch {
+        return $null
+    }
+}
+
 function Normalize-PathString($Path) {
     if ([string]::IsNullOrWhiteSpace($Path)) {
         return ''
@@ -99,6 +110,7 @@ $checks = @(
     (Test-File 'Proof\unreal-map-smoke.ps1'),
     (Test-File 'Proof\build-and-test-policy.ps1'),
     (Test-File 'Proof\playtest-render.ps1'),
+    (Test-File 'Proof\current-build-hot-reload-status.ps1'),
     (Test-File 'scripts\sync-skills.ps1'),
     (Test-File 'scripts\validate_skills.py'),
     (Test-File '.agents\skills\using-agent-skills\SKILL.md'),
@@ -252,6 +264,7 @@ $proofClaimState = @{
     ClaimsFrontEndHostSmoke = $false
     ClaimsTwoPlayerJoinSmoke = $false
     ClaimsBotMatchSmoke = $false
+    ClaimsCurrentBuildHotReloadReady = $false
     ClaimsDesktopCurrentBuildShortcut = [bool](
         $desktopShortcutInfo.Exists -and
         $desktopShortcutInfo.TargetMatchesCurrentBuildLauncher -and
@@ -706,6 +719,32 @@ if (Test-Path -LiteralPath $policyBuildResultPath -PathType Leaf) {
     }
 }
 
+$currentBuildHotReloadStatusPath = Join-Path $ProjectRoot 'Saved\Proof\current-build-hot-reload-status.json'
+$currentBuildHotReloadStatus = $null
+$currentBuildHotReloadStatusScript = Join-Path $ProjectRoot 'Proof\current-build-hot-reload-status.ps1'
+if (Test-Path -LiteralPath $currentBuildHotReloadStatusScript -PathType Leaf) {
+    $hotReloadRaw = (& powershell -NoProfile -ExecutionPolicy Bypass -File $currentBuildHotReloadStatusScript -ProjectRoot $ProjectRoot 2>$null) | Out-String
+    if ($hotReloadRaw.Trim()) {
+        try {
+            $currentBuildHotReloadStatus = $hotReloadRaw | ConvertFrom-Json
+        } catch {
+            $currentBuildHotReloadStatus = Read-JsonOrNull $currentBuildHotReloadStatusPath
+        }
+    }
+}
+if (-not $currentBuildHotReloadStatus) {
+    $currentBuildHotReloadStatus = Read-JsonOrNull $currentBuildHotReloadStatusPath
+}
+if ($currentBuildHotReloadStatus) {
+    $proofClaimState.ClaimsCurrentBuildHotReloadReady = [bool](
+        $currentBuildHotReloadStatus.Status -in @(
+            'hot_reload_ready',
+            'hot_reload_pending_next_boundary',
+            'hot_reload_armed_observing_external_until_needed'
+        )
+    )
+}
+
 $result = [pscustomobject]@{
     ProjectRoot = $ProjectRoot
     EngineRoot = $engineRoot
@@ -728,6 +767,7 @@ $result = [pscustomobject]@{
     LastBotMatchSmoke = $lastBotMatchResult
     LastPlaytestRender = $lastPlaytestRender
     LastPolicyBuildAndTest = $policyBuildResult
+    LastCurrentBuildHotReloadStatus = $currentBuildHotReloadStatus
     NextProofNeeded = @(
         'Open Unreal Editor UI against ArchonFactoryCanary.uproject',
         'Manually launch SPLITROOT Current Build.lnk for feel/playtest after smoke proof',
@@ -737,6 +777,7 @@ $result = [pscustomobject]@{
         'Persist map-table actor placement or bootstrap policy for production maps',
         'Replace canary text-render map-table feedback with production RTS UI',
         'Run manual rendered playtest for Lenswright Bracewright/Sundial readability and pressure-bolt feel',
+        'Keep Proof\current-build-hot-reload-status.ps1 green while other sessions land gameplay slices',
         'Package a Windows build'
     )
 }

@@ -43,6 +43,12 @@ infrastructure that is meant to continue match to match until Jonathan quits.
 - The design goal is continuous hosting: scoreboard or pending-next-match,
   automatic next match, humans kept in the flow, latest maps picked up next
   round, and future supervisor/reconnect support for fresh C++ builds.
+- `Proof/current-build-hot-reload-status.ps1` is the first check before
+  questioning whether another session's work is really live. It writes
+  `Saved/Proof/current-build-hot-reload-status.json`; green states are
+  `hot_reload_ready`, `hot_reload_pending_next_boundary`, and
+  `hot_reload_armed_observing_external_until_needed`. A blocked/no-supervisor
+  state means do not claim live adoption yet.
 - After changing proof, launcher, build, import, or playtest automation, run
   `python scripts/check_live_canary_process_safety.py` and fix any broad
   UnrealEditor stop patterns before reporting the task done.

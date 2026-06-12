@@ -339,24 +339,31 @@ function Get-FileUtcString([string]$Path) {
     return (Get-Item -LiteralPath $Path).LastWriteTimeUtc.ToString('o')
 }
 
-function Test-BoundaryBuildBlockedForInputs([datetime]$CompileNewestUtc, [string]$PendingModuleText) {
+function Test-BoundaryBuildBlockedForInputs($CompileNewestUtc, $NativeRequiredUtc, [string]$PendingModuleText) {
     $blocked = Get-JsonFile $boundaryBuildBlockedPath
     if (-not $blocked -or -not $blocked.BuildBlocked) { return $false }
-    if ($null -eq $CompileNewestUtc -or -not $PendingModuleText) { return $false }
+    if ((($null -eq $CompileNewestUtc) -and ($null -eq $NativeRequiredUtc)) -or -not $PendingModuleText) { return $false }
 
     $blockedCompileUtc = ConvertTo-UtcDate $blocked.CompileNewestUtc
-    if ($null -eq $blockedCompileUtc) { return $false }
+    $blockedNativeUtc = ConvertTo-UtcDate $blocked.NativeRequiredAfterUtc
 
-    return [bool](
-        $blocked.PendingModuleDllUtc -eq $PendingModuleText -and
-        [math]::Abs((($blockedCompileUtc).ToUniversalTime() - $CompileNewestUtc.ToUniversalTime()).TotalSeconds) -lt 1.0
+    $compileMatches = [bool](
+        $blockedCompileUtc -and $CompileNewestUtc -and
+        [math]::Abs(($blockedCompileUtc.ToUniversalTime() - $CompileNewestUtc.ToUniversalTime()).TotalSeconds) -lt 1.0
     )
+    $nativeMatches = [bool](
+        $blockedNativeUtc -and $NativeRequiredUtc -and
+        [math]::Abs(($blockedNativeUtc.ToUniversalTime() - $NativeRequiredUtc.ToUniversalTime()).TotalSeconds) -lt 1.0
+    )
+
+    return [bool]($blocked.PendingModuleDllUtc -eq $PendingModuleText -and ($compileMatches -or $nativeMatches))
 }
 
 function Write-BoundaryBuildBlocked(
     [string]$Reason,
     [string]$PendingModuleText,
     [string]$CompileNewestText,
+    [string]$NativeRequiredText,
     [object]$BuildResult
 ) {
     [pscustomobject]@{
@@ -365,6 +372,7 @@ function Write-BoundaryBuildBlocked(
         Reason = $Reason
         PendingModuleDllUtc = $PendingModuleText
         CompileNewestUtc = $CompileNewestText
+        NativeRequiredAfterUtc = $NativeRequiredText
         BuildExitCode = $BuildResult.BuildExitCode
         PolicyBuildExitCode = $BuildResult.PolicyBuildExitCode
         AutomationExitCode = $BuildResult.AutomationExitCode
@@ -417,6 +425,15 @@ function Get-NewestInputUtc([string[]]$RelativeRoots, [string[]]$Extensions, [st
     return $newest
 }
 
+function Get-BotStrategyNativeRequirementUtc {
+    $path = Join-Path $ProjectRoot 'games\splitroot\FactoryContracts\bot_strategy_tuning.json'
+    $tuning = Get-JsonFile $path
+    if (-not $tuning -or -not $tuning.PSObject.Properties['native_requires_module_after_utc']) {
+        return $null
+    }
+    ConvertTo-UtcDate $tuning.native_requires_module_after_utc
+}
+
 function Get-PendingAdoption([string]$Fingerprint) {
     $currentModuleText = Get-FingerprintField $Fingerprint 'moduleDllUtc'
     $processStartText = Get-FingerprintField $Fingerprint 'processStartUtc'
@@ -436,17 +453,22 @@ function Get-PendingAdoption([string]$Fingerprint) {
         -RelativeRoots @('Content', 'games\splitroot\Content') `
         -Extensions @('.uasset', '.umap', '.png', '.wav', '.obj', '.glb', '.fbx')
     $runtimeNewestUtc = Get-MaxUtcDate $runtimeContractNewestUtc $runtimeContentNewestUtc
+    $nativeRequiredUtc = Get-BotStrategyNativeRequirementUtc
 
-    $requiresBuild = [bool]($compileNewestUtc -and $pendingModuleUtc -and $compileNewestUtc -gt $pendingModuleUtc.AddSeconds(1))
+    $sourceRequiresBuild = [bool]($compileNewestUtc -and $pendingModuleUtc -and $compileNewestUtc -gt $pendingModuleUtc.AddSeconds(1))
+    $nativeRequiresBuild = [bool]($nativeRequiredUtc -and $pendingModuleUtc -and $nativeRequiredUtc -gt $pendingModuleUtc.AddSeconds(1))
+    $requiresBuild = [bool]($sourceRequiresBuild -or $nativeRequiresBuild)
     $moduleNewerThanRunning = [bool]($currentModuleUtc -and $pendingModuleUtc -and $pendingModuleUtc -gt $currentModuleUtc.AddSeconds(1))
     $runtimeNewerThanProcess = [bool]($processStartUtc -and $runtimeNewestUtc -and $runtimeNewestUtc -gt $processStartUtc.AddSeconds(1))
-    $boundaryBuildBlocked = $requiresBuild -and (Test-BoundaryBuildBlockedForInputs -CompileNewestUtc $compileNewestUtc -PendingModuleText $pendingModuleText)
+    $boundaryBuildBlocked = $requiresBuild -and (Test-BoundaryBuildBlockedForInputs -CompileNewestUtc $compileNewestUtc -NativeRequiredUtc $nativeRequiredUtc -PendingModuleText $pendingModuleText)
 
     $reason = ''
     if ($boundaryBuildBlocked) {
         $reason = 'boundary_build_failed_latest_not_adopted'
-    } elseif ($requiresBuild) {
+    } elseif ($sourceRequiresBuild) {
         $reason = 'source_newer_than_module_boundary_build_pending'
+    } elseif ($nativeRequiresBuild) {
+        $reason = 'native_requirement_newer_than_module_boundary_build_pending'
     } elseif ($moduleNewerThanRunning) {
         $reason = 'newer_module_boundary_refresh_pending'
     } elseif ($runtimeNewerThanProcess) {
@@ -457,11 +479,14 @@ function Get-PendingAdoption([string]$Fingerprint) {
         Pending = [bool]($reason -and -not $boundaryBuildBlocked)
         Reason = $reason
         RequiresBuild = $requiresBuild
+        SourceRequiresBuild = $sourceRequiresBuild
+        NativeRequiresBuild = $nativeRequiresBuild
         BoundaryBuildBlocked = [bool]$boundaryBuildBlocked
         CurrentModuleDllUtc = $currentModuleText
         CurrentProcessStartUtc = $processStartText
         PendingModuleDllUtc = $pendingModuleText
         CompileNewestUtc = Format-UtcDate $compileNewestUtc
+        NativeRequiredAfterUtc = Format-UtcDate $nativeRequiredUtc
         RuntimeNewestUtc = Format-UtcDate $runtimeNewestUtc
     }
 }
@@ -700,6 +725,7 @@ while ($true) {
                             -Reason 'boundary_build_failed_latest_not_adopted' `
                             -PendingModuleText $buildResult.ModuleDllUtcAfterBuild `
                             -CompileNewestText $(if ($detected) { $detected.CompileNewestUtc } else { '' }) `
+                            -NativeRequiredText $(if ($detected) { $detected.NativeRequiredAfterUtc } else { '' }) `
                             -BuildResult $buildResult
                     }
                     $newState = Start-SupervisedHost
@@ -727,6 +753,7 @@ while ($true) {
                         ModuleDllUtcBeforeBuild = $buildResult.ModuleDllUtcBeforeBuild
                         ModuleDllUtcAfterBuild = $buildResult.ModuleDllUtcAfterBuild
                         CompileNewestUtc = if ($detected) { $detected.CompileNewestUtc } else { '' }
+                        NativeRequiredAfterUtc = if ($detected) { $detected.NativeRequiredAfterUtc } else { '' }
                         RuntimeNewestUtc = if ($detected) { $detected.RuntimeNewestUtc } else { '' }
                         BoundaryBuildLogPath = $buildResult.BuildLogPath
                         PendingStatePath = $pendingPath
@@ -749,8 +776,72 @@ while ($true) {
 
     if ($state -and $state.SupervisorOwnsHost -and -not (Get-ProcessAlive ([int]$state.Pid))) {
         if ($pending -and $pending.Pending -and $AllowBoundaryRefresh) {
-            Write-SupervisorEvent "owned host exited during pending refresh; relaunching oldPid=$($state.Pid)"
-            Start-SupervisedHost | Out-Null
+            $beforePid = [int]$state.Pid
+            $pendingFingerprint = if ($pending.CurrentBuildFingerprint) { [string]$pending.CurrentBuildFingerprint } else { $fingerprint }
+            $exitDetected = Get-PendingAdoption $pendingFingerprint
+            $refreshReason = if ($exitDetected -and $exitDetected.Pending) { $exitDetected.Reason } else { [string]$pending.Reason }
+            $refreshRequiresBuild = [bool]($exitDetected -and $exitDetected.Pending -and $exitDetected.RequiresBuild)
+            $currentModuleUtc = if ($exitDetected -and $exitDetected.CurrentModuleDllUtc) { $exitDetected.CurrentModuleDllUtc } elseif ($pending.CurrentModuleDllUtc) { [string]$pending.CurrentModuleDllUtc } else { '' }
+            $pendingModuleUtc = if ($exitDetected -and $exitDetected.PendingModuleDllUtc) { $exitDetected.PendingModuleDllUtc } elseif ($pending.PendingModuleDllUtc) { [string]$pending.PendingModuleDllUtc } else { '' }
+            Write-PendingState `
+                -Reason 'fresh_build_host_exit_refresh' `
+                -ProcessId $beforePid `
+                -Fingerprint $pendingFingerprint `
+                -NextMap $nextMap `
+                -OwnsHost $true `
+                -Mode 'supervisor_refreshing_after_host_exit' `
+                -ClientState 'host_refreshing_build_reconnecting' `
+                -CurrentModuleDllUtc $currentModuleUtc `
+                -PendingModuleDllUtc $pendingModuleUtc
+
+            Write-SupervisorEvent "owned host exited during pending refresh; building before relaunch oldPid=$beforePid reason=$refreshReason"
+            $buildResult = Invoke-BoundaryBuild -Reason $refreshReason -RequiresBuild $refreshRequiresBuild
+            if ($buildResult.BuildRequired -and -not $buildResult.BuildSucceeded) {
+                Write-BoundaryBuildBlocked `
+                    -Reason 'boundary_build_failed_latest_not_adopted' `
+                    -PendingModuleText $buildResult.ModuleDllUtcAfterBuild `
+                    -CompileNewestText $(if ($exitDetected) { $exitDetected.CompileNewestUtc } else { '' }) `
+                    -NativeRequiredText $(if ($exitDetected) { $exitDetected.NativeRequiredAfterUtc } else { '' }) `
+                    -BuildResult $buildResult
+            }
+            $newState = Start-SupervisedHost
+            $afterPid = if ($newState) { [int]$newState.Pid } else { 0 }
+            $proof = [pscustomobject]@{
+                ProofUtc = (Get-Date).ToUniversalTime().ToString('o')
+                ProcessBoundary = if ($afterPid) { 'host_exit_fresh_process_relaunch' } else { 'unknown' }
+                BeforePid = $beforePid
+                AfterPid = $afterPid
+                BeforeBuildFingerprint = $pendingFingerprint
+                NextMap = $nextMap
+                RefreshTrigger = 'host_exit_pending_refresh'
+                PendingReason = $refreshReason
+                PendingDetected = [bool]($exitDetected -and $exitDetected.Pending)
+                BuildAtBoundary = [bool]$BuildAtBoundary
+                BuildAttempted = [bool]$buildResult.BuildAttempted
+                BuildRequired = [bool]$buildResult.BuildRequired
+                BuildExitCode = $buildResult.BuildExitCode
+                PolicyBuildExitCode = $buildResult.PolicyBuildExitCode
+                AutomationExitCode = $buildResult.AutomationExitCode
+                AutomationSucceeded = $buildResult.AutomationSucceeded
+                AutomationFailedCount = $buildResult.AutomationFailedCount
+                BuildSucceeded = [bool]$buildResult.BuildSucceeded
+                ModuleTimestampAdvanced = [bool]$buildResult.ModuleTimestampAdvanced
+                ModuleDllUtcBeforeBuild = $buildResult.ModuleDllUtcBeforeBuild
+                ModuleDllUtcAfterBuild = $buildResult.ModuleDllUtcAfterBuild
+                CompileNewestUtc = if ($exitDetected) { $exitDetected.CompileNewestUtc } else { '' }
+                NativeRequiredAfterUtc = if ($exitDetected) { $exitDetected.NativeRequiredAfterUtc } else { '' }
+                RuntimeNewestUtc = if ($exitDetected) { $exitDetected.RuntimeNewestUtc } else { '' }
+                BoundaryBuildLogPath = $buildResult.BuildLogPath
+                PendingStatePath = $pendingPath
+                SupervisorStatePath = $supervisorStatePath
+                ClientReconnectPlaceholder = $true
+                TouchedExternalLiveProcess = $false
+            }
+            $proof | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $refreshProofPath -Encoding UTF8
+
+            if ($buildResult.BuildRequired -and -not $buildResult.BuildSucceeded -and $afterPid) {
+                Clear-PendingState 'boundary_build_failed_latest_not_adopted'
+            }
         } elseif ($RestartOnCrash) {
             Write-SupervisorEvent "owned host exited; RestartOnCrash=true so relaunching oldPid=$($state.Pid)"
             Start-SupervisedHost | Out-Null
@@ -841,6 +932,7 @@ while ($true) {
                                 -Reason 'boundary_build_failed_latest_not_adopted' `
                                 -PendingModuleText $buildResult.ModuleDllUtcAfterBuild `
                                 -CompileNewestText $(if ($externalDetected) { $externalDetected.CompileNewestUtc } else { '' }) `
+                                -NativeRequiredText $(if ($externalDetected) { $externalDetected.NativeRequiredAfterUtc } else { '' }) `
                                 -BuildResult $buildResult
                         }
                         $newState = Start-SupervisedHost
@@ -869,6 +961,7 @@ while ($true) {
                             ModuleDllUtcBeforeBuild = $buildResult.ModuleDllUtcBeforeBuild
                             ModuleDllUtcAfterBuild = $buildResult.ModuleDllUtcAfterBuild
                             CompileNewestUtc = if ($externalDetected) { $externalDetected.CompileNewestUtc } else { '' }
+                            NativeRequiredAfterUtc = if ($externalDetected) { $externalDetected.NativeRequiredAfterUtc } else { '' }
                             RuntimeNewestUtc = if ($externalDetected) { $externalDetected.RuntimeNewestUtc } else { '' }
                             ExternalStopAttempted = [bool]$stopResult.StopAttempted
                             ExternalStopSucceeded = [bool]$stopResult.StopSucceeded
